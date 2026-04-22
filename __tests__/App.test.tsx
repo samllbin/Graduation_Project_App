@@ -19,17 +19,25 @@ jest.mock('react-native-safe-area-context', () => {
 });
 
 describe('App auth flow', () => {
+  let renderer: ReactTestRenderer.ReactTestRenderer | null = null;
+
   beforeEach(() => {
     jest.useFakeTimers();
   });
 
-  afterEach(() => {
-    jest.runOnlyPendingTimers();
+  afterEach(async () => {
+    if (renderer) {
+      await ReactTestRenderer.act(() => {
+        renderer!.unmount();
+      });
+      renderer = null;
+    }
+
+    jest.clearAllTimers();
     jest.useRealTimers();
   });
 
   test('shows success feedback and navigates to home after login', async () => {
-    let renderer: ReactTestRenderer.ReactTestRenderer;
     await ReactTestRenderer.act(() => {
       renderer = ReactTestRenderer.create(<App />);
     });
@@ -46,7 +54,6 @@ describe('App auth flow', () => {
   });
 
   test('home screen keeps logout button in profile tab', async () => {
-    let renderer: ReactTestRenderer.ReactTestRenderer;
     await ReactTestRenderer.act(() => {
       renderer = ReactTestRenderer.create(<App />);
     });
@@ -66,3 +73,4 @@ describe('App auth flow', () => {
     ).toBeGreaterThan(0);
   });
 });
+
