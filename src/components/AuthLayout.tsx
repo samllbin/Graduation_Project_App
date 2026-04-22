@@ -2,11 +2,12 @@ import React from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {agriTheme} from '../theme/agriTheme';
 
 type Props = {children: React.ReactNode};
 
@@ -28,19 +29,21 @@ export default function AuthLayout({children}: Props) {
 
 const styles = StyleSheet.create({
   flex: {flex: 1},
-  safeArea: {flex: 1, backgroundColor: '#f3f7ff'},
+  safeArea: {flex: 1, backgroundColor: agriTheme.colors.pageBg},
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 24,
+    paddingHorizontal: agriTheme.spacing.lg,
+    paddingVertical: agriTheme.spacing.xl,
   },
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
+    backgroundColor: agriTheme.colors.cardBg,
+    borderRadius: agriTheme.radius.lg,
+    borderWidth: 1,
+    borderColor: agriTheme.colors.border,
+    padding: agriTheme.spacing.lg,
+    shadowColor: '#1f2937',
+    shadowOpacity: 0.06,
     shadowRadius: 10,
     elevation: 3,
   },

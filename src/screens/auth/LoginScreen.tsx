@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -8,9 +8,10 @@ import {
   View,
 } from 'react-native';
 import AuthLayout from '../../components/AuthLayout';
-import {loginApi} from '../../api/auth';
-import {setToken} from '../../store/authStore';
-import {validateLoginInput} from './validators';
+import { loginApi } from '../../api/auth';
+import { setToken } from '../../store/authStore';
+import { validateLoginInput } from './validators';
+import { agriTheme } from '../../theme/agriTheme';
 
 type Props = {
   onGotoRegister: () => void;
@@ -64,6 +65,7 @@ export default function LoginScreen({
       <TextInput
         style={styles.input}
         placeholder="账号（用户名或邮箱）"
+        placeholderTextColor="#93a19a"
         value={login}
         onChangeText={setLogin}
         autoCapitalize="none"
@@ -71,6 +73,7 @@ export default function LoginScreen({
       <TextInput
         style={styles.input}
         placeholder="密码"
+        placeholderTextColor="#93a19a"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -78,7 +81,11 @@ export default function LoginScreen({
 
       {!!error && <Text style={styles.error}>{error}</Text>}
 
-      <Pressable style={styles.primaryButton} onPress={onSubmit} disabled={loading}>
+      <Pressable
+        style={styles.primaryButton}
+        onPress={onSubmit}
+        disabled={loading}
+      >
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
@@ -99,32 +106,33 @@ export default function LoginScreen({
 }
 
 const styles = StyleSheet.create({
-  title: {fontSize: 28, fontWeight: '700', color: '#111827'},
-  subtitle: {fontSize: 14, color: '#6b7280', marginTop: 6, marginBottom: 16},
+  title: agriTheme.text.title,
+  subtitle: { ...agriTheme.text.subtitle, marginTop: 6, marginBottom: 16 },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 12,
+    borderColor: agriTheme.colors.border,
+    borderRadius: agriTheme.radius.md,
     paddingHorizontal: 12,
     paddingVertical: 11,
     marginBottom: 12,
     fontSize: 15,
-    color: '#111827',
+    color: agriTheme.colors.textMain,
+    backgroundColor: '#fbfdfb',
   },
-  error: {color: '#dc2626', marginBottom: 10},
+  error: { color: agriTheme.colors.danger, marginBottom: 10 },
   primaryButton: {
     marginTop: 2,
-    backgroundColor: '#2563eb',
+    backgroundColor: agriTheme.colors.primary,
     height: 46,
-    borderRadius: 12,
+    borderRadius: agriTheme.radius.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  primaryButtonText: {color: '#fff', fontSize: 16, fontWeight: '600'},
+  primaryButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   linkRow: {
     marginTop: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  link: {color: '#2563eb', fontSize: 14, fontWeight: '500'},
+  link: { color: agriTheme.colors.primary, fontSize: 14, fontWeight: '600' },
 });

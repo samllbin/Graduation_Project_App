@@ -11,6 +11,7 @@ import AuthLayout from '../../components/AuthLayout';
 import {loginApi, registerApi, sendRegisterCodeApi} from '../../api/auth';
 import {setToken} from '../../store/authStore';
 import {validateRegisterInput} from './validators';
+import {agriTheme} from '../../theme/agriTheme';
 
 type Props = {
   onBackLogin: () => void;
@@ -109,12 +110,13 @@ export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) 
 
   return (
     <AuthLayout>
-      <Text style={styles.title}>注册</Text>
-      <Text style={styles.subtitle}>创建新账号并开始使用</Text>
+      <Text style={styles.title}>病虫害识别注册</Text>
+      <Text style={styles.subtitle}>创建账号并开始诊断病虫害</Text>
 
       <TextInput
         style={styles.input}
         placeholder="用户名"
+        placeholderTextColor="#93a19a"
         value={userName}
         onChangeText={setUserName}
         autoCapitalize="none"
@@ -122,6 +124,7 @@ export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) 
       <TextInput
         style={styles.input}
         placeholder="邮箱"
+        placeholderTextColor="#93a19a"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
@@ -132,15 +135,19 @@ export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) 
         <TextInput
           style={[styles.input, styles.codeInput]}
           placeholder="验证码"
+          placeholderTextColor="#93a19a"
           value={code}
           onChangeText={setCode}
         />
         <Pressable
-          style={[styles.codeButton, (sendingCode || countdown > 0) && styles.codeButtonDisabled]}
+          style={[
+            styles.codeButton,
+            (sendingCode || countdown > 0) && styles.codeButtonDisabled,
+          ]}
           onPress={onSendCode}
           disabled={sendingCode || countdown > 0}>
           {sendingCode ? (
-            <ActivityIndicator color="#2563eb" />
+            <ActivityIndicator color={agriTheme.colors.primary} />
           ) : (
             <Text style={styles.codeButtonText}>{sendCodeLabel}</Text>
           )}
@@ -150,6 +157,7 @@ export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) 
       <TextInput
         style={styles.input}
         placeholder="密码"
+        placeholderTextColor="#93a19a"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -157,6 +165,7 @@ export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) 
       <TextInput
         style={styles.input}
         placeholder="确认密码"
+        placeholderTextColor="#93a19a"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
@@ -181,46 +190,52 @@ export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) 
 }
 
 const styles = StyleSheet.create({
-  title: {fontSize: 28, fontWeight: '700', color: '#111827'},
-  subtitle: {fontSize: 14, color: '#6b7280', marginTop: 6, marginBottom: 16},
+  title: agriTheme.text.title,
+  subtitle: {...agriTheme.text.subtitle, marginTop: 6, marginBottom: 16},
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 12,
+    borderColor: agriTheme.colors.border,
+    borderRadius: agriTheme.radius.md,
     paddingHorizontal: 12,
     paddingVertical: 11,
     marginBottom: 12,
     fontSize: 15,
-    color: '#111827',
+    color: agriTheme.colors.textMain,
+    backgroundColor: '#fbfdfb',
   },
   codeRow: {flexDirection: 'row', alignItems: 'center', marginBottom: 12},
   codeInput: {flex: 1, marginBottom: 0},
   codeButton: {
     marginLeft: 8,
     height: 44,
-    borderRadius: 12,
+    borderRadius: agriTheme.radius.md,
     borderWidth: 1,
-    borderColor: '#2563eb',
+    borderColor: agriTheme.colors.primary,
     paddingHorizontal: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: agriTheme.colors.primarySoft,
   },
   codeButtonDisabled: {
-    borderColor: '#93c5fd',
-    backgroundColor: '#eff6ff',
+    borderColor: '#9acbaa',
+    backgroundColor: '#f1f8f2',
   },
-  codeButtonText: {color: '#2563eb', fontWeight: '600', fontSize: 13},
-  error: {color: '#dc2626', marginBottom: 10},
-  success: {color: '#16a34a', marginBottom: 10},
+  codeButtonText: {
+    color: agriTheme.colors.primary,
+    fontWeight: '600',
+    fontSize: 13,
+  },
+  error: {color: agriTheme.colors.danger, marginBottom: 10},
+  success: {color: agriTheme.colors.success, marginBottom: 10},
   primaryButton: {
     marginTop: 2,
-    backgroundColor: '#2563eb',
+    backgroundColor: agriTheme.colors.primary,
     height: 46,
-    borderRadius: 12,
+    borderRadius: agriTheme.radius.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   primaryButtonText: {color: '#fff', fontSize: 16, fontWeight: '600'},
   backLinkWrap: {marginTop: 14, alignSelf: 'center'},
-  link: {color: '#2563eb', fontSize: 14, fontWeight: '500'},
+  link: {color: agriTheme.colors.primary, fontSize: 14, fontWeight: '600'},
 });
