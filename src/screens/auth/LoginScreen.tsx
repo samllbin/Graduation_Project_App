@@ -10,6 +10,7 @@ import {
 import AuthLayout from '../../components/AuthLayout';
 import { loginApi } from '../../api/auth';
 import { setToken } from '../../store/authStore';
+import { saveSession } from '../../store/authSession';
 import { validateLoginInput } from './validators';
 import { agriTheme } from '../../theme/agriTheme';
 
@@ -43,13 +44,15 @@ export default function LoginScreen({
         login: login.trim(),
         password,
       });
-      const token = response.data?.access_token || '';
-      if (!token) {
+      const accessToken = response.data?.access_token || '';
+      const refreshToken = response.data?.refresh_token || '';
+      if (!accessToken || !refreshToken) {
         setError(response.message || '登录失败');
         return;
       }
-      setToken(token);
-      onLoginSuccess(token);
+      setToken(accessToken);
+      await saveSession({accessToken, refreshToken});
+      onLoginSuccess(accessToken);
     } catch (e: any) {
       setError(e?.message || '网络错误，请稍后再试');
     } finally {

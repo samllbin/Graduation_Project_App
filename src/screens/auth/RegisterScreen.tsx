@@ -10,6 +10,7 @@ import {
 import AuthLayout from '../../components/AuthLayout';
 import {loginApi, registerApi, sendRegisterCodeApi} from '../../api/auth';
 import {setToken} from '../../store/authStore';
+import {saveSession} from '../../store/authSession';
 import {validateRegisterInput} from './validators';
 import {agriTheme} from '../../theme/agriTheme';
 
@@ -91,14 +92,16 @@ export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) 
         login: userName.trim(),
         password,
       });
-      const token = loginResponse.data?.access_token || '';
-      if (!token) {
+      const accessToken = loginResponse.data?.access_token || '';
+      const refreshToken = loginResponse.data?.refresh_token || '';
+      if (!accessToken || !refreshToken) {
         setSuccess(`${registerMessage}，请返回登录`);
         return;
       }
-      setToken(token);
+      setToken(accessToken);
+      await saveSession({accessToken, refreshToken});
       setSuccess(`${registerMessage}，正在自动登录`);
-      onRegisterSuccess(token);
+      onRegisterSuccess(accessToken);
     } catch (e: any) {
       setError(e?.message || '注册失败');
     } finally {

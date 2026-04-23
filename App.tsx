@@ -1,12 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {StyleSheet, Text, View} from 'react-native';
-import {Card} from '@rneui/themed';
+import {StyleSheet, View} from 'react-native';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
-import {clearToken} from './src/store/authStore';
+import {
+  clearToken,
+  setAuthExpiredHandler,
+  setToken as setStoreToken,
+} from './src/store/authStore';
+import {clearSession, getSessionTokens} from './src/store/authSession';
+import {logoutApi} from './src/api/auth';
 import MainTabBar from './src/components/MainTabBar';
+import ToastMessage from './src/components/ToastMessage';
 import {MainTabKey} from './src/config/mainTabs';
 import ImageRecognitionScreen from './src/screens/main/ImageRecognitionScreen';
 import ForumScreen from './src/screens/main/ForumScreen';
@@ -19,7 +25,35 @@ export default function App() {
   const [route, setRoute] = useState<RouteName>('login');
   const [token, setToken] = useState('');
   const [showLoginSuccess, setShowLoginSuccess] = useState(false);
+  const [showReloginNotice, setShowReloginNotice] = useState(false);
   const [activeTab, setActiveTab] = useState<MainTabKey>('imageRecognition');
+
+  useEffect(() => {
+    (async () => {
+      const session = await getSessionTokens();
+      if (!session?.accessToken) {
+        return;
+      }
+
+      setStoreToken(session.accessToken);
+      setToken(session.accessToken);
+      setRoute('home');
+    })();
+  }, []);
+
+  useEffect(() => {
+    setAuthExpiredHandler(() => {
+      setShowReloginNotice(true);
+      setToken('');
+      setRoute('login');
+      setShowLoginSuccess(false);
+      setActiveTab('imageRecognition');
+    });
+
+    return () => {
+      setAuthExpiredHandler(null);
+    };
+  }, []);
 
   useEffect(() => {
     if (!showLoginSuccess) {
@@ -33,11 +67,29 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [showLoginSuccess]);
 
-  const onLogout = () => {
+  useEffect(() => {
+    if (!showReloginNotice) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setShowReloginNotice(false);
+    }, 1800);
+
+    return () => clearTimeout(timer);
+  }, [showReloginNotice]);
+
+  const onLogout = async () => {
+    try {
+      await logoutApi();
+    } catch {}
+
     clearToken();
+    await clearSession();
     setToken('');
     setRoute('login');
     setShowLoginSuccess(false);
+    setShowReloginNotice(false);
     setActiveTab('imageRecognition');
   };
 
@@ -45,12 +97,14 @@ export default function App() {
     setToken(nextToken);
     setRoute('home');
     setShowLoginSuccess(true);
+    setShowReloginNotice(false);
     setActiveTab('imageRecognition');
   };
 
   const onRegisterSuccess = (nextToken: string) => {
     setToken(nextToken);
     setRoute('home');
+    setShowReloginNotice(false);
     setActiveTab('imageRecognition');
   };
 
@@ -96,9 +150,11 @@ export default function App() {
         ) : null}
 
         {showLoginSuccess && (
-          <Card containerStyle={styles.toastCard} testID="login-success-snackbar">
-            <Text style={styles.toastText}>登录成功</Text>
-          </Card>
+          <ToastMessage message="登录成功" testID="login-success-snackbar" />
+        )}
+
+        {showReloginNotice && (
+          <ToastMessage message="请重新登录" testID="relogin-snackbar" />
         )}
       </View>
     </SafeAreaProvider>
@@ -109,21 +165,4 @@ const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: agriTheme.colors.pageBg},
   homeWrap: {flex: 1, backgroundColor: agriTheme.colors.pageBg},
   homeContent: {flex: 1},
-  toastCard: {
-    position: 'absolute',
-    top: 18,
-    left: 16,
-    right: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: agriTheme.colors.border,
-    margin: 0,
-    backgroundColor: '#1f2b22',
-  },
-  toastText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 14,
-    fontWeight: '600',
-  },
 });
