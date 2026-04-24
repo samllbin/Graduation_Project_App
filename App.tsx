@@ -139,6 +139,9 @@ function AppInner() {
                 component={PostDetailScreen}
                 options={{ title: '帖子详情' }}
               />
+              <Stack.Screen name="ForgotPassword" options={{ title: '找回密码' }}>
+                {() => <ForgotPasswordScreen onBackLogin={() => {}} />}
+              </Stack.Screen>
             </>
           ) : (
             <>
