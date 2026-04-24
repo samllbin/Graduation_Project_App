@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Button } from '@rneui/themed';
+import { Button, Dialog } from '@rneui/themed';
 import ProfileHeader from '../../components/profile/ProfileHeader';
 import ProfileMenu from '../../components/profile/ProfileMenu';
 import { getUserInfo, setUserInfo } from '../../store/authStore';
@@ -20,6 +20,7 @@ export default function ProfileScreen({ onLogout }: Props) {
     avatar: string;
     signature: string;
   } | null>(null);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const loadUser = useCallback(async () => {
     const memory = getUserInfo();
@@ -54,26 +55,52 @@ export default function ProfileScreen({ onLogout }: Props) {
     { label: '我点赞的帖子', icon: '❤️', onPress: () => navigation.navigate('LikedPosts') },
   ];
 
+  const confirmLogout = () => {
+    setShowLogoutDialog(false);
+    onLogout();
+  };
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ProfileHeader
-        userName={user?.userName || ''}
-        avatar={user?.avatar || ''}
-        signature={user?.signature || ''}
-        onUpdate={setUser}
-      />
+    <>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <ProfileHeader
+          userName={user?.userName || ''}
+          avatar={user?.avatar || ''}
+          signature={user?.signature || ''}
+          onUpdate={setUser}
+        />
 
-      <View style={styles.menuWrap}>
-        <ProfileMenu items={menuItems} />
-      </View>
+        <View style={styles.menuWrap}>
+          <ProfileMenu items={menuItems} />
+        </View>
 
-      <Button
-        title="退出登录"
-        onPress={onLogout}
-        buttonStyle={styles.logoutButton}
-        titleStyle={styles.logoutText}
-      />
-    </ScrollView>
+        <Button
+          title="退出登录"
+          onPress={() => setShowLogoutDialog(true)}
+          buttonStyle={styles.logoutButton}
+          titleStyle={styles.logoutText}
+        />
+      </ScrollView>
+
+      <Dialog
+        isVisible={showLogoutDialog}
+        onBackdropPress={() => setShowLogoutDialog(false)}
+        overlayStyle={{ backgroundColor: agriTheme.colors.cardBg, borderRadius: agriTheme.radius.lg }}>
+        <Dialog.Title title="确认退出" titleStyle={{ color: agriTheme.colors.textMain }} />
+        <Dialog.Actions>
+          <Dialog.Button
+            title="取消"
+            onPress={() => setShowLogoutDialog(false)}
+            titleStyle={{ color: agriTheme.colors.textSecondary }}
+          />
+          <Dialog.Button
+            title="确认退出"
+            onPress={confirmLogout}
+            titleStyle={{ color: agriTheme.colors.danger }}
+          />
+        </Dialog.Actions>
+      </Dialog>
+    </>
   );
 }
 
