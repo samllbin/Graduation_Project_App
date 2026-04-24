@@ -6,10 +6,11 @@ import { validateForgotInput } from './validators';
 import { useTheme } from '../../theme/useTheme';
 
 type Props = {
-  onBackLogin: () => void;
+  onBackLogin?: () => void;
+  onResetSuccess?: () => void;
 };
 
-export default function ForgotPasswordScreen({ onBackLogin }: Props) {
+export default function ForgotPasswordScreen({ onBackLogin, onResetSuccess }: Props) {
   const theme = useTheme();
   const [login, setLogin] = useState('');
   const [code, setCode] = useState('');
@@ -73,7 +74,8 @@ export default function ForgotPasswordScreen({ onBackLogin }: Props) {
         code: code.trim(),
         newPassword,
       });
-      setSuccess(response.message || '密码重置成功，请返回登录');
+      setSuccess(response.message || '密码重置成功，请重新登录');
+      onResetSuccess?.();
     } catch (e: any) {
       setError(e?.message || '重置失败');
     } finally {
@@ -189,9 +191,11 @@ export default function ForgotPasswordScreen({ onBackLogin }: Props) {
         )}
       </Pressable>
 
-      <Pressable onPress={onBackLogin} style={styles.backLinkWrap}>
-        <Text style={styles.link}>返回登录</Text>
-      </Pressable>
+      {onBackLogin && (
+        <Pressable onPress={onBackLogin} style={styles.backLinkWrap}>
+          <Text style={styles.link}>返回登录</Text>
+        </Pressable>
+      )}
     </AuthLayout>
   );
 }

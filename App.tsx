@@ -140,7 +140,7 @@ function AppInner() {
                 options={{ title: '帖子详情' }}
               />
               <Stack.Screen name="ForgotPassword" options={{ title: '找回密码' }}>
-                {() => <ForgotPasswordScreen onBackLogin={() => {}} />}
+                {() => <ForgotPasswordScreen onResetSuccess={onLogout} />}
               </Stack.Screen>
             </>
           ) : (
@@ -171,7 +171,7 @@ function AppInner() {
                 )}
               </Stack.Screen>
               <Stack.Screen name="ForgotPassword" options={{ title: '找回密码' }}>
-                {() => <ForgotPasswordScreen onBackLogin={() => {}} />}
+                {({navigation}) => <ForgotPasswordScreen onBackLogin={() => navigation.goBack()} />}
               </Stack.Screen>
             </>
           )}
