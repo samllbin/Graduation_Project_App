@@ -98,8 +98,12 @@ export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) 
         setSuccess(`${registerMessage}，请返回登录`);
         return;
       }
+      const user = loginResponse.data?.user;
+      const userInfo = user
+        ? {id: user.id, userName: user.userName, avatar: user.avatar, signature: user.signature}
+        : null;
       setToken(accessToken);
-      await saveSession({accessToken, refreshToken});
+      await saveSession({accessToken, refreshToken, userInfo});
       setSuccess(`${registerMessage}，正在自动登录`);
       onRegisterSuccess(accessToken);
     } catch (e: any) {

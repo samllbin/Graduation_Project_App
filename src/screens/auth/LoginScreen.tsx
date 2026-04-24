@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import AuthLayout from '../../components/AuthLayout';
 import { loginApi } from '../../api/auth';
-import { setToken } from '../../store/authStore';
+import { setToken, setUserInfo } from '../../store/authStore';
 import { saveSession } from '../../store/authSession';
 import { validateLoginInput } from './validators';
 import { agriTheme } from '../../theme/agriTheme';
@@ -50,8 +50,13 @@ export default function LoginScreen({
         setError(response.message || '登录失败');
         return;
       }
+      const user = response.data?.user;
+      const userInfo = user
+        ? {id: user.id, userName: user.userName, avatar: user.avatar, signature: user.signature}
+        : null;
       setToken(accessToken);
-      await saveSession({accessToken, refreshToken});
+      setUserInfo(userInfo);
+      await saveSession({accessToken, refreshToken, userInfo});
       onLoginSuccess(accessToken);
     } catch (e: any) {
       setError(e?.message || '网络错误，请稍后再试');

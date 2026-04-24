@@ -1,162 +1,186 @@
 import React, {useEffect, useState} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {StyleSheet, View} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
-import {
-  clearToken,
-  setAuthExpiredHandler,
-  setToken as setStoreToken,
-} from './src/store/authStore';
-import {clearSession, getSessionTokens} from './src/store/authSession';
-import {logoutApi} from './src/api/auth';
-import MainTabBar from './src/components/MainTabBar';
-import ToastMessage from './src/components/ToastMessage';
-import {MainTabKey} from './src/config/mainTabs';
 import ImageRecognitionScreen from './src/screens/main/ImageRecognitionScreen';
 import ForumScreen from './src/screens/main/ForumScreen';
 import ProfileScreen from './src/screens/main/ProfileScreen';
+import ChangePasswordScreen from './src/screens/main/ChangePasswordScreen';
+import LikedPostsScreen from './src/screens/main/LikedPostsScreen';
+import ToastMessage from './src/components/ToastMessage';
+import MainTabBar from './src/components/MainTabBar';
+import {
+  clearToken,
+  clearUserInfo,
+  setAuthExpiredHandler,
+  setToken as setStoreToken,
+  setUserInfo,
+} from './src/store/authStore';
+import {clearSession, getSessionTokens, getStoredUserInfo} from './src/store/authSession';
+import {logoutApi} from './src/api/auth';
 import {agriTheme} from './src/theme/agriTheme';
 
-type RouteName = 'login' | 'register' | 'forgot' | 'home';
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+const ProfileStack = createNativeStackNavigator();
+
+function ProfileStackScreen({onLogout}: {onLogout: () => void}) {
+  return (
+    <ProfileStack.Navigator
+      screenOptions={{
+        headerStyle: {backgroundColor: agriTheme.colors.pageBg},
+        headerTintColor: agriTheme.colors.primary,
+        headerTitleStyle: {color: agriTheme.colors.textMain, fontWeight: '700'},
+        contentStyle: {backgroundColor: agriTheme.colors.pageBg},
+      }}>
+      <ProfileStack.Screen
+        name="ProfileMain"
+        options={{headerShown: false}}>
+        {() => <ProfileScreen onLogout={onLogout} />}
+      </ProfileStack.Screen>
+      <ProfileStack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
+        options={{title: '修改密码'}}
+      />
+      <ProfileStack.Screen
+        name="LikedPosts"
+        component={LikedPostsScreen}
+        options={{title: '我点赞的帖子'}}
+      />
+    </ProfileStack.Navigator>
+  );
+}
+
+function HomeTabs({onLogout, showLoginSuccess}: {onLogout: () => void; showLoginSuccess: boolean}) {
+  const [activeTab, setActiveTab] = React.useState('imageRecognition');
+
+  return (
+    <View style={styles.homeWrap} testID="home-screen">
+      <View style={styles.homeContent}>
+        {activeTab === 'forum' && <ForumScreen />}
+        {activeTab === 'profile' && <ProfileScreen onLogout={onLogout} />}
+        {activeTab !== 'forum' && activeTab !== 'profile' && <ImageRecognitionScreen />}
+      </View>
+      <MainTabBar activeTab={activeTab as any} onChangeTab={setActiveTab as any} />
+      {showLoginSuccess && <ToastMessage message="登录成功" testID="login-success-snackbar" />}
+    </View>
+  );
+}
 
 export default function App() {
-  const [route, setRoute] = useState<RouteName>('login');
-  const [token, setToken] = useState('');
-  const [showLoginSuccess, setShowLoginSuccess] = useState(false);
+  const [initializing, setInitializing] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showReloginNotice, setShowReloginNotice] = useState(false);
-  const [activeTab, setActiveTab] = useState<MainTabKey>('imageRecognition');
+  const [showLoginSuccess, setShowLoginSuccess] = useState(false);
 
   useEffect(() => {
     (async () => {
       const session = await getSessionTokens();
-      if (!session?.accessToken) {
-        return;
+      if (session?.accessToken) {
+        setStoreToken(session.accessToken);
+        const userInfo = await getStoredUserInfo();
+        if (userInfo) {
+          setUserInfo(userInfo);
+        }
+        setIsLoggedIn(true);
       }
-
-      setStoreToken(session.accessToken);
-      setToken(session.accessToken);
-      setRoute('home');
+      setInitializing(false);
     })();
   }, []);
 
   useEffect(() => {
     setAuthExpiredHandler(() => {
       setShowReloginNotice(true);
-      setToken('');
-      setRoute('login');
-      setShowLoginSuccess(false);
-      setActiveTab('imageRecognition');
+      setTimeout(() => {
+        setShowReloginNotice(false);
+        setIsLoggedIn(false);
+      }, 1800);
     });
-
-    return () => {
-      setAuthExpiredHandler(null);
-    };
+    return () => setAuthExpiredHandler(null);
   }, []);
-
-  useEffect(() => {
-    if (!showLoginSuccess) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setShowLoginSuccess(false);
-    }, 1800);
-
-    return () => clearTimeout(timer);
-  }, [showLoginSuccess]);
-
-  useEffect(() => {
-    if (!showReloginNotice) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setShowReloginNotice(false);
-    }, 1800);
-
-    return () => clearTimeout(timer);
-  }, [showReloginNotice]);
 
   const onLogout = async () => {
     try {
       await logoutApi();
     } catch {}
-
     clearToken();
+    clearUserInfo();
     await clearSession();
-    setToken('');
-    setRoute('login');
+    setShowReloginNotice(false);
     setShowLoginSuccess(false);
-    setShowReloginNotice(false);
-    setActiveTab('imageRecognition');
+    setIsLoggedIn(false);
   };
 
-  const onLoginSuccess = (nextToken: string) => {
-    setToken(nextToken);
-    setRoute('home');
-    setShowLoginSuccess(true);
-    setShowReloginNotice(false);
-    setActiveTab('imageRecognition');
-  };
-
-  const onRegisterSuccess = (nextToken: string) => {
-    setToken(nextToken);
-    setRoute('home');
-    setShowReloginNotice(false);
-    setActiveTab('imageRecognition');
-  };
-
-  const renderHomeContent = () => {
-    if (activeTab === 'forum') {
-      return <ForumScreen />;
-    }
-
-    if (activeTab === 'profile') {
-      return <ProfileScreen onLogout={onLogout} />;
-    }
-
-    return <ImageRecognitionScreen />;
-  };
+  if (initializing) {
+    return (
+      <SafeAreaProvider>
+        <View style={styles.container} />
+      </SafeAreaProvider>
+    );
+  }
 
   return (
     <SafeAreaProvider>
-      <View style={styles.container}>
-        {route === 'register' && (
-          <RegisterScreen
-            onBackLogin={() => setRoute('login')}
-            onRegisterSuccess={onRegisterSuccess}
-          />
-        )}
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: {backgroundColor: agriTheme.colors.pageBg},
+            headerTintColor: agriTheme.colors.primary,
+            headerTitleStyle: {color: agriTheme.colors.textMain, fontWeight: '700'},
+            contentStyle: {backgroundColor: agriTheme.colors.pageBg},
+          }}>
+          {isLoggedIn ? (
+            <Stack.Screen
+              name="Home"
+              options={{headerShown: false}}>
+              {() => <HomeTabs onLogout={onLogout} showLoginSuccess={showLoginSuccess} />}
+            </Stack.Screen>
+          ) : (
+            <>
+              <Stack.Screen name="Login" options={{headerShown: false}}>
+                {() => (
+                  <LoginScreen
+                    onGotoRegister={() => {}}
+                    onGotoForgot={() => {}}
+                    onLoginSuccess={() => {
+                  setIsLoggedIn(true);
+                  setShowLoginSuccess(true);
+                  setTimeout(() => setShowLoginSuccess(false), 1800);
+                }}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="Register" options={{title: '注册'}}>
+                {() => (
+                  <RegisterScreen
+                    onBackLogin={() => {}}
+                    onRegisterSuccess={() => {
+                  setIsLoggedIn(true);
+                  setShowLoginSuccess(true);
+                  setTimeout(() => setShowLoginSuccess(false), 1800);
+                }}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="ForgotPassword" options={{title: '找回密码'}}>
+                {() => <ForgotPasswordScreen onBackLogin={() => {}} />}
+              </Stack.Screen>
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
 
-        {route === 'forgot' && (
-          <ForgotPasswordScreen onBackLogin={() => setRoute('login')} />
-        )}
-
-        {route === 'login' && (
-          <LoginScreen
-            onGotoRegister={() => setRoute('register')}
-            onGotoForgot={() => setRoute('forgot')}
-            onLoginSuccess={onLoginSuccess}
-          />
-        )}
-
-        {route === 'home' && token ? (
-          <View style={styles.homeWrap} testID="home-screen">
-            <View style={styles.homeContent}>{renderHomeContent()}</View>
-            <MainTabBar activeTab={activeTab} onChangeTab={setActiveTab} />
-          </View>
-        ) : null}
-
-        {showLoginSuccess && (
-          <ToastMessage message="登录成功" testID="login-success-snackbar" />
-        )}
-
-        {showReloginNotice && (
+      {showReloginNotice && (
+        <View style={styles.toastWrap}>
           <ToastMessage message="请重新登录" testID="relogin-snackbar" />
-        )}
-      </View>
+        </View>
+      )}
     </SafeAreaProvider>
   );
 }
@@ -165,4 +189,12 @@ const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: agriTheme.colors.pageBg},
   homeWrap: {flex: 1, backgroundColor: agriTheme.colors.pageBg},
   homeContent: {flex: 1},
+  toastWrap: {
+    position: 'absolute',
+    top: 60,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 999,
+  },
 });

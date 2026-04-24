@@ -8,6 +8,12 @@ type AuthSession = {
   accessToken: string;
   refreshToken: string;
   deviceId: string;
+  userInfo?: {
+    id: number;
+    userName: string;
+    avatar: string;
+    signature: string;
+  };
 };
 
 const parseSession = (raw: string): AuthSession | null => {
@@ -22,6 +28,7 @@ const parseSession = (raw: string): AuthSession | null => {
         accessToken: parsed.accessToken,
         refreshToken: parsed.refreshToken,
         deviceId: parsed.deviceId,
+        userInfo: parsed.userInfo || undefined,
       };
     }
     return null;
@@ -81,6 +88,7 @@ export const getSessionTokens = async (): Promise<{
 export const saveSession = async (params: {
   accessToken: string;
   refreshToken: string;
+  userInfo?: AuthSession['userInfo'] | null;
 }): Promise<void> => {
   const session = await readSession();
   const deviceId = session?.deviceId || (await DeviceInfo.getUniqueId());
@@ -89,6 +97,7 @@ export const saveSession = async (params: {
     accessToken: params.accessToken,
     refreshToken: params.refreshToken,
     deviceId,
+    userInfo: params.userInfo || undefined,
   });
 };
 
@@ -113,6 +122,21 @@ export const updateAccessToken = async (accessToken: string): Promise<void> => {
 export const getStoredRefreshToken = async (): Promise<string> => {
   const session = await readSession();
   return session?.refreshToken || '';
+};
+
+export const getStoredUserInfo = async (): Promise<AuthSession['userInfo'] | null> => {
+  const session = await readSession();
+  return session?.userInfo || null;
+};
+
+export const updateStoredUserInfo = async (
+  userInfo: AuthSession['userInfo'],
+): Promise<void> => {
+  const session = await readSession();
+  if (!session) {
+    return;
+  }
+  await writeSession({...session, userInfo});
 };
 
 export const clearSession = async (): Promise<void> => {
