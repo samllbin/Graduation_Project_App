@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
@@ -21,43 +21,48 @@ import {
   setToken as setStoreToken,
   setUserInfo,
 } from './src/store/authStore';
-import {clearSession, getSessionTokens, getStoredUserInfo} from './src/store/authSession';
-import {logoutApi} from './src/api/auth';
-import {agriTheme} from './src/theme/agriTheme';
+import { clearSession, getSessionTokens, getStoredUserInfo } from './src/store/authSession';
+import { logoutApi } from './src/api/auth';
+import { agriTheme } from './src/theme/agriTheme';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const ProfileStack = createNativeStackNavigator();
 
-function ProfileStackScreen({onLogout}: {onLogout: () => void}) {
+function ProfileStackScreen({ onLogout }: { onLogout: () => void }) {
   return (
     <ProfileStack.Navigator
       screenOptions={{
-        headerStyle: {backgroundColor: agriTheme.colors.pageBg},
+        headerStyle: { backgroundColor: agriTheme.colors.pageBg },
         headerTintColor: agriTheme.colors.primary,
-        headerTitleStyle: {color: agriTheme.colors.textMain, fontWeight: '700'},
-        contentStyle: {backgroundColor: agriTheme.colors.pageBg},
-      }}>
-      <ProfileStack.Screen
-        name="ProfileMain"
-        options={{headerShown: false}}>
+        headerTitleStyle: { color: agriTheme.colors.textMain, fontWeight: '700' },
+        contentStyle: { backgroundColor: agriTheme.colors.pageBg },
+      }}
+    >
+      <ProfileStack.Screen name="ProfileMain" options={{ headerShown: false }}>
         {() => <ProfileScreen onLogout={onLogout} />}
       </ProfileStack.Screen>
       <ProfileStack.Screen
         name="ChangePassword"
         component={ChangePasswordScreen}
-        options={{title: '修改密码'}}
+        options={{ title: '修改密码' }}
       />
       <ProfileStack.Screen
         name="LikedPosts"
         component={LikedPostsScreen}
-        options={{title: '我点赞的帖子'}}
+        options={{ title: '我点赞的帖子' }}
       />
     </ProfileStack.Navigator>
   );
 }
 
-function HomeTabs({onLogout, showLoginSuccess}: {onLogout: () => void; showLoginSuccess: boolean}) {
+function HomeTabs({
+  onLogout,
+  showLoginSuccess,
+}: {
+  onLogout: () => void;
+  showLoginSuccess: boolean;
+}) {
   const [activeTab, setActiveTab] = React.useState('imageRecognition');
 
   return (
@@ -130,45 +135,44 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{
-            headerStyle: {backgroundColor: agriTheme.colors.pageBg},
+            headerStyle: { backgroundColor: agriTheme.colors.pageBg },
             headerTintColor: agriTheme.colors.primary,
-            headerTitleStyle: {color: agriTheme.colors.textMain, fontWeight: '700'},
-            contentStyle: {backgroundColor: agriTheme.colors.pageBg},
-          }}>
+            headerTitleStyle: { color: agriTheme.colors.textMain, fontWeight: '700' },
+            contentStyle: { backgroundColor: agriTheme.colors.pageBg },
+          }}
+        >
           {isLoggedIn ? (
-            <Stack.Screen
-              name="Home"
-              options={{headerShown: false}}>
+            <Stack.Screen name="Home" options={{ headerShown: false }}>
               {() => <HomeTabs onLogout={onLogout} showLoginSuccess={showLoginSuccess} />}
             </Stack.Screen>
           ) : (
             <>
-              <Stack.Screen name="Login" options={{headerShown: false}}>
+              <Stack.Screen name="Login" options={{ headerShown: false }}>
                 {() => (
                   <LoginScreen
                     onGotoRegister={() => {}}
                     onGotoForgot={() => {}}
                     onLoginSuccess={() => {
-                  setIsLoggedIn(true);
-                  setShowLoginSuccess(true);
-                  setTimeout(() => setShowLoginSuccess(false), 1800);
-                }}
+                      setIsLoggedIn(true);
+                      setShowLoginSuccess(true);
+                      setTimeout(() => setShowLoginSuccess(false), 1800);
+                    }}
                   />
                 )}
               </Stack.Screen>
-              <Stack.Screen name="Register" options={{title: '注册'}}>
+              <Stack.Screen name="Register" options={{ title: '注册' }}>
                 {() => (
                   <RegisterScreen
                     onBackLogin={() => {}}
                     onRegisterSuccess={() => {
-                  setIsLoggedIn(true);
-                  setShowLoginSuccess(true);
-                  setTimeout(() => setShowLoginSuccess(false), 1800);
-                }}
+                      setIsLoggedIn(true);
+                      setShowLoginSuccess(true);
+                      setTimeout(() => setShowLoginSuccess(false), 1800);
+                    }}
                   />
                 )}
               </Stack.Screen>
-              <Stack.Screen name="ForgotPassword" options={{title: '找回密码'}}>
+              <Stack.Screen name="ForgotPassword" options={{ title: '找回密码' }}>
                 {() => <ForgotPasswordScreen onBackLogin={() => {}} />}
               </Stack.Screen>
             </>
@@ -186,9 +190,9 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: agriTheme.colors.pageBg},
-  homeWrap: {flex: 1, backgroundColor: agriTheme.colors.pageBg},
-  homeContent: {flex: 1},
+  container: { flex: 1, backgroundColor: agriTheme.colors.pageBg },
+  homeWrap: { flex: 1, backgroundColor: agriTheme.colors.pageBg },
+  homeContent: { flex: 1 },
   toastWrap: {
     position: 'absolute',
     top: 60,

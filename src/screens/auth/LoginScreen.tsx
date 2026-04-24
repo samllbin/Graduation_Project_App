@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import AuthLayout from '../../components/AuthLayout';
 import { loginApi } from '../../api/auth';
 import { setToken, setUserInfo } from '../../store/authStore';
@@ -20,11 +13,7 @@ type Props = {
   onLoginSuccess: (token: string) => void;
 };
 
-export default function LoginScreen({
-  onGotoRegister,
-  onGotoForgot,
-  onLoginSuccess,
-}: Props) {
+export default function LoginScreen({ onGotoRegister, onGotoForgot, onLoginSuccess }: Props) {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -52,11 +41,11 @@ export default function LoginScreen({
       }
       const user = response.data?.user;
       const userInfo = user
-        ? {id: user.id, userName: user.userName, avatar: user.avatar, signature: user.signature}
+        ? { id: user.id, userName: user.userName, avatar: user.avatar, signature: user.signature }
         : null;
       setToken(accessToken);
       setUserInfo(userInfo);
-      await saveSession({accessToken, refreshToken, userInfo});
+      await saveSession({ accessToken, refreshToken, userInfo });
       onLoginSuccess(accessToken);
     } catch (e: any) {
       setError(e?.message || '网络错误，请稍后再试');
@@ -89,11 +78,7 @@ export default function LoginScreen({
 
       {!!error && <Text style={styles.error}>{error}</Text>}
 
-      <Pressable
-        style={styles.primaryButton}
-        onPress={onSubmit}
-        disabled={loading}
-      >
+      <Pressable style={styles.primaryButton} onPress={onSubmit} disabled={loading}>
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (

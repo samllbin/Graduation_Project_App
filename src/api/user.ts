@@ -1,8 +1,7 @@
-import {ApiResponse, ChangePasswordReq, UpdateProfileReq, UserProfile} from '../types';
-import {http} from './http';
+import { ApiResponse, ChangePasswordReq, UpdateProfileReq, UserProfile } from '../types';
+import { http } from './http';
 
-const asApiResponse = <T>(promise: Promise<any>) =>
-  promise as Promise<ApiResponse<T>>;
+const asApiResponse = <T>(promise: Promise<any>) => promise as Promise<ApiResponse<T>>;
 
 export const getUserProfileApi = (userName: string) =>
   asApiResponse<UserProfile>(http.get(`/user/${userName}`));
@@ -18,7 +17,7 @@ export const uploadImageApi = (formData: FormData) =>
     url: string;
   }>(
     http.post('/upload/image', formData, {
-      headers: {'Content-Type': 'multipart/form-data'},
+      headers: { 'Content-Type': 'multipart/form-data' },
     }),
   );
 

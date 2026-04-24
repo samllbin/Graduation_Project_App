@@ -1,14 +1,14 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import {Card} from '@rneui/themed';
-import {agriTheme} from '../theme/agriTheme';
+import { StyleSheet, Text, View } from 'react-native';
+import { Card } from '@rneui/themed';
+import { agriTheme } from '../theme/agriTheme';
 
 type Props = {
   message: string;
   testID?: string;
 };
 
-export default function ToastMessage({message, testID}: Props) {
+export default function ToastMessage({ message, testID }: Props) {
   return (
     <View testID={testID}>
       <Card containerStyle={styles.toastCard}>

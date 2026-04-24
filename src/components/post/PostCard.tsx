@@ -1,34 +1,34 @@
-import React, {useState} from 'react';
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
-import {Avatar} from '@rneui/themed';
-import {PostItem} from '../../types';
-import {agriTheme} from '../../theme/agriTheme';
+import React, { useState } from 'react';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Avatar } from '@rneui/themed';
+import { PostItem } from '../../types';
+import { agriTheme } from '../../theme/agriTheme';
 
 type Props = {
   post: PostItem;
   onLikeToggle?: (postId: number, liked: boolean) => void;
 };
 
-export default function PostCard({post, onLikeToggle}: Props) {
+export default function PostCard({ post, onLikeToggle }: Props) {
   const [liked, setLiked] = useState(!!post.liked);
   const [likeCount, setLikeCount] = useState(post.likeCount);
 
   const handleLike = async () => {
     const nextLiked = !liked;
     setLiked(nextLiked);
-    setLikeCount((prev) => (nextLiked ? prev + 1 : Math.max(prev - 1, 0)));
+    setLikeCount(prev => (nextLiked ? prev + 1 : Math.max(prev - 1, 0)));
     onLikeToggle?.(post.id, nextLiked);
   };
 
   const avatarSource = post.author?.avatar
-    ? {uri: post.author.avatar}
-    : {uri: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=default%20user%20avatar&size=128x128'};
+    ? { uri: post.author.avatar }
+    : {
+        uri: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=default%20user%20avatar&size=128x128',
+      };
 
   return (
     <View style={styles.card}>
-      {post.coverImageUrl && (
-        <Image source={{uri: post.coverImageUrl}} style={styles.cover} />
-      )}
+      {post.coverImageUrl && <Image source={{ uri: post.coverImageUrl }} style={styles.cover} />}
 
       <View style={styles.body}>
         {post.title && (
@@ -54,9 +54,7 @@ export default function PostCard({post, onLikeToggle}: Props) {
             <Text style={[styles.likeIcon, liked && styles.likeIconActive]}>
               {liked ? '❤️' : '🤍'}
             </Text>
-            <Text style={[styles.likeCount, liked && styles.likeCountActive]}>
-              {likeCount}
-            </Text>
+            <Text style={[styles.likeCount, liked && styles.likeCountActive]}>{likeCount}</Text>
           </Pressable>
         </View>
       </View>

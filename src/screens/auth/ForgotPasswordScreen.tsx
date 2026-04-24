@@ -1,22 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import AuthLayout from '../../components/AuthLayout';
-import {resetForgotPasswordApi, sendForgotCodeApi} from '../../api/auth';
-import {validateForgotInput} from './validators';
-import {agriTheme} from '../../theme/agriTheme';
+import { resetForgotPasswordApi, sendForgotCodeApi } from '../../api/auth';
+import { validateForgotInput } from './validators';
+import { agriTheme } from '../../theme/agriTheme';
 
 type Props = {
   onBackLogin: () => void;
 };
 
-export default function ForgotPasswordScreen({onBackLogin}: Props) {
+export default function ForgotPasswordScreen({ onBackLogin }: Props) {
   const [login, setLogin] = useState('');
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -49,7 +42,7 @@ export default function ForgotPasswordScreen({onBackLogin}: Props) {
       setSendingCode(true);
       setError('');
       setSuccess('');
-      const response = await sendForgotCodeApi({login: login.trim()});
+      const response = await sendForgotCodeApi({ login: login.trim() });
       setSuccess(response.message || '验证码已发送');
       setCountdown(60);
     } catch (e: any) {
@@ -112,12 +105,10 @@ export default function ForgotPasswordScreen({onBackLogin}: Props) {
           onChangeText={setCode}
         />
         <Pressable
-          style={[
-            styles.codeButton,
-            (sendingCode || countdown > 0) && styles.codeButtonDisabled,
-          ]}
+          style={[styles.codeButton, (sendingCode || countdown > 0) && styles.codeButtonDisabled]}
           onPress={onSendCode}
-          disabled={sendingCode || countdown > 0}>
+          disabled={sendingCode || countdown > 0}
+        >
           {sendingCode ? (
             <ActivityIndicator color={agriTheme.colors.primary} />
           ) : (
@@ -155,7 +146,7 @@ export default function ForgotPasswordScreen({onBackLogin}: Props) {
 
 const styles = StyleSheet.create({
   title: agriTheme.text.title,
-  subtitle: {...agriTheme.text.subtitle, marginTop: 6, marginBottom: 16},
+  subtitle: { ...agriTheme.text.subtitle, marginTop: 6, marginBottom: 16 },
   input: {
     borderWidth: 1,
     borderColor: agriTheme.colors.border,
@@ -167,8 +158,8 @@ const styles = StyleSheet.create({
     color: agriTheme.colors.textMain,
     backgroundColor: '#fbfdfb',
   },
-  codeRow: {flexDirection: 'row', alignItems: 'center', marginBottom: 12},
-  codeInput: {flex: 1, marginBottom: 0},
+  codeRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  codeInput: { flex: 1, marginBottom: 0 },
   codeButton: {
     marginLeft: 8,
     height: 44,
@@ -189,8 +180,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 13,
   },
-  error: {color: agriTheme.colors.danger, marginBottom: 10},
-  success: {color: agriTheme.colors.success, marginBottom: 10},
+  error: { color: agriTheme.colors.danger, marginBottom: 10 },
+  success: { color: agriTheme.colors.success, marginBottom: 10 },
   primaryButton: {
     marginTop: 2,
     backgroundColor: agriTheme.colors.primary,
@@ -199,7 +190,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  primaryButtonText: {color: '#fff', fontSize: 16, fontWeight: '600'},
-  backLinkWrap: {marginTop: 14, alignSelf: 'center'},
-  link: {color: agriTheme.colors.primary, fontSize: 14, fontWeight: '600'},
+  primaryButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  backLinkWrap: { marginTop: 14, alignSelf: 'center' },
+  link: { color: agriTheme.colors.primary, fontSize: 14, fontWeight: '600' },
 });

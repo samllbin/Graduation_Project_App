@@ -1,25 +1,18 @@
-import React, {useEffect, useState} from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import AuthLayout from '../../components/AuthLayout';
-import {loginApi, registerApi, sendRegisterCodeApi} from '../../api/auth';
-import {setToken} from '../../store/authStore';
-import {saveSession} from '../../store/authSession';
-import {validateRegisterInput} from './validators';
-import {agriTheme} from '../../theme/agriTheme';
+import { loginApi, registerApi, sendRegisterCodeApi } from '../../api/auth';
+import { setToken } from '../../store/authStore';
+import { saveSession } from '../../store/authSession';
+import { validateRegisterInput } from './validators';
+import { agriTheme } from '../../theme/agriTheme';
 
 type Props = {
   onBackLogin: () => void;
   onRegisterSuccess: (token: string) => void;
 };
 
-export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) {
+export default function RegisterScreen({ onBackLogin, onRegisterSuccess }: Props) {
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
@@ -54,7 +47,7 @@ export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) 
       setSendingCode(true);
       setError('');
       setSuccess('');
-      const response = await sendRegisterCodeApi({email: email.trim()});
+      const response = await sendRegisterCodeApi({ email: email.trim() });
       setSuccess(response.message || '验证码已发送');
       setCountdown(60);
     } catch (e: any) {
@@ -100,10 +93,10 @@ export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) 
       }
       const user = loginResponse.data?.user;
       const userInfo = user
-        ? {id: user.id, userName: user.userName, avatar: user.avatar, signature: user.signature}
+        ? { id: user.id, userName: user.userName, avatar: user.avatar, signature: user.signature }
         : null;
       setToken(accessToken);
-      await saveSession({accessToken, refreshToken, userInfo});
+      await saveSession({ accessToken, refreshToken, userInfo });
       setSuccess(`${registerMessage}，正在自动登录`);
       onRegisterSuccess(accessToken);
     } catch (e: any) {
@@ -147,12 +140,10 @@ export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) 
           onChangeText={setCode}
         />
         <Pressable
-          style={[
-            styles.codeButton,
-            (sendingCode || countdown > 0) && styles.codeButtonDisabled,
-          ]}
+          style={[styles.codeButton, (sendingCode || countdown > 0) && styles.codeButtonDisabled]}
           onPress={onSendCode}
-          disabled={sendingCode || countdown > 0}>
+          disabled={sendingCode || countdown > 0}
+        >
           {sendingCode ? (
             <ActivityIndicator color={agriTheme.colors.primary} />
           ) : (
@@ -198,7 +189,7 @@ export default function RegisterScreen({onBackLogin, onRegisterSuccess}: Props) 
 
 const styles = StyleSheet.create({
   title: agriTheme.text.title,
-  subtitle: {...agriTheme.text.subtitle, marginTop: 6, marginBottom: 16},
+  subtitle: { ...agriTheme.text.subtitle, marginTop: 6, marginBottom: 16 },
   input: {
     borderWidth: 1,
     borderColor: agriTheme.colors.border,
@@ -210,8 +201,8 @@ const styles = StyleSheet.create({
     color: agriTheme.colors.textMain,
     backgroundColor: '#fbfdfb',
   },
-  codeRow: {flexDirection: 'row', alignItems: 'center', marginBottom: 12},
-  codeInput: {flex: 1, marginBottom: 0},
+  codeRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  codeInput: { flex: 1, marginBottom: 0 },
   codeButton: {
     marginLeft: 8,
     height: 44,
@@ -232,8 +223,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 13,
   },
-  error: {color: agriTheme.colors.danger, marginBottom: 10},
-  success: {color: agriTheme.colors.success, marginBottom: 10},
+  error: { color: agriTheme.colors.danger, marginBottom: 10 },
+  success: { color: agriTheme.colors.success, marginBottom: 10 },
   primaryButton: {
     marginTop: 2,
     backgroundColor: agriTheme.colors.primary,
@@ -242,7 +233,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  primaryButtonText: {color: '#fff', fontSize: 16, fontWeight: '600'},
-  backLinkWrap: {marginTop: 14, alignSelf: 'center'},
-  link: {color: agriTheme.colors.primary, fontSize: 14, fontWeight: '600'},
+  primaryButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  backLinkWrap: { marginTop: 14, alignSelf: 'center' },
+  link: { color: agriTheme.colors.primary, fontSize: 14, fontWeight: '600' },
 });

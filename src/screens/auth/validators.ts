@@ -19,11 +19,7 @@ export const validateRegisterInput = (data: {
   return '';
 };
 
-export const validateForgotInput = (data: {
-  login: string;
-  code: string;
-  newPassword: string;
-}) => {
+export const validateForgotInput = (data: { login: string; code: string; newPassword: string }) => {
   if (!data.login.trim()) return '请输入账号或邮箱';
   if (!data.code.trim()) return '请输入验证码';
   if (!data.newPassword) return '请输入新密码';

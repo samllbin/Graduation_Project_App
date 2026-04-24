@@ -38,7 +38,7 @@ const parseSession = (raw: string): AuthSession | null => {
 };
 
 const readSession = async (): Promise<AuthSession | null> => {
-  const credentials = await Keychain.getGenericPassword({service: AUTH_SERVICE});
+  const credentials = await Keychain.getGenericPassword({ service: AUTH_SERVICE });
   if (!credentials) {
     return null;
   }
@@ -47,11 +47,9 @@ const readSession = async (): Promise<AuthSession | null> => {
 };
 
 const writeSession = async (session: AuthSession): Promise<void> => {
-  await Keychain.setGenericPassword(
-    AUTH_USERNAME,
-    JSON.stringify(session),
-    {service: AUTH_SERVICE},
-  );
+  await Keychain.setGenericPassword(AUTH_USERNAME, JSON.stringify(session), {
+    service: AUTH_SERVICE,
+  });
 };
 
 export const getOrCreateDeviceId = async (): Promise<string> => {
@@ -129,16 +127,14 @@ export const getStoredUserInfo = async (): Promise<AuthSession['userInfo'] | nul
   return session?.userInfo || null;
 };
 
-export const updateStoredUserInfo = async (
-  userInfo: AuthSession['userInfo'],
-): Promise<void> => {
+export const updateStoredUserInfo = async (userInfo: AuthSession['userInfo']): Promise<void> => {
   const session = await readSession();
   if (!session) {
     return;
   }
-  await writeSession({...session, userInfo});
+  await writeSession({ ...session, userInfo });
 };
 
 export const clearSession = async (): Promise<void> => {
-  await Keychain.resetGenericPassword({service: AUTH_SERVICE});
+  await Keychain.resetGenericPassword({ service: AUTH_SERVICE });
 };

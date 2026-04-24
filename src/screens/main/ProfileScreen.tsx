@@ -1,19 +1,19 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {Button} from '@rneui/themed';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Button } from '@rneui/themed';
 import ProfileHeader from '../../components/profile/ProfileHeader';
 import ProfileMenu from '../../components/profile/ProfileMenu';
-import {getUserInfo, setUserInfo} from '../../store/authStore';
-import {getStoredUserInfo, updateStoredUserInfo} from '../../store/authSession';
-import {getUserProfileApi} from '../../api/user';
-import {agriTheme} from '../../theme/agriTheme';
+import { getUserInfo, setUserInfo } from '../../store/authStore';
+import { getStoredUserInfo, updateStoredUserInfo } from '../../store/authSession';
+import { getUserProfileApi } from '../../api/user';
+import { agriTheme } from '../../theme/agriTheme';
 
 type Props = {
   onLogout: () => void;
 };
 
-export default function ProfileScreen({onLogout}: Props) {
+export default function ProfileScreen({ onLogout }: Props) {
   const navigation = useNavigation<any>();
   const [user, setUser] = useState<{
     userName: string;
@@ -50,8 +50,8 @@ export default function ProfileScreen({onLogout}: Props) {
   }, [loadUser]);
 
   const menuItems = [
-    {label: '修改密码', icon: '🔒', onPress: () => navigation.navigate('ChangePassword')},
-    {label: '我点赞的帖子', icon: '❤️', onPress: () => navigation.navigate('LikedPosts')},
+    { label: '修改密码', icon: '🔒', onPress: () => navigation.navigate('ChangePassword') },
+    { label: '我点赞的帖子', icon: '❤️', onPress: () => navigation.navigate('LikedPosts') },
   ];
 
   return (

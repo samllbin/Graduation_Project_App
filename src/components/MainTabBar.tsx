@@ -1,23 +1,20 @@
 import React from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
-import {mainTabItems, MainTabKey} from '../config/mainTabs';
-import {agriTheme} from '../theme/agriTheme';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { mainTabItems, MainTabKey } from '../config/mainTabs';
+import { agriTheme } from '../theme/agriTheme';
 
 type Props = {
   activeTab: MainTabKey;
   onChangeTab: (tab: MainTabKey) => void;
 };
 
-export default function MainTabBar({activeTab, onChangeTab}: Props) {
+export default function MainTabBar({ activeTab, onChangeTab }: Props) {
   return (
     <View style={styles.wrap}>
       {mainTabItems.map(item => {
         const focused = item.key === activeTab;
         return (
-          <Pressable
-            key={item.key}
-            style={styles.tabItem}
-            onPress={() => onChangeTab(item.key)}>
+          <Pressable key={item.key} style={styles.tabItem} onPress={() => onChangeTab(item.key)}>
             <Text style={[styles.icon, focused && styles.iconFocused]}>{item.icon}</Text>
             <Text style={[styles.label, focused && styles.labelFocused]}>{item.title}</Text>
           </Pressable>

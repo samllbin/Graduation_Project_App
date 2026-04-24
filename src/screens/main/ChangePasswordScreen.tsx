@@ -1,13 +1,13 @@
-import React, {useCallback, useState} from 'react';
-import {ActivityIndicator, Pressable, StyleSheet, Text, View} from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useNavigation} from '@react-navigation/native';
-import {Input, Button} from '@rneui/themed';
-import {changePasswordApi} from '../../api/user';
-import {clearToken, clearUserInfo} from '../../store/authStore';
-import {clearSession} from '../../store/authSession';
-import {agriTheme} from '../../theme/agriTheme';
+import React, { useCallback, useState } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+import { Input, Button } from '@rneui/themed';
+import { changePasswordApi } from '../../api/user';
+import { clearToken, clearUserInfo } from '../../store/authStore';
+import { clearSession } from '../../store/authSession';
+import { agriTheme } from '../../theme/agriTheme';
 
 type RootStackParamList = {
   Login: undefined;
@@ -25,8 +25,8 @@ export default function ChangePasswordScreen() {
   useFocusEffect(
     useCallback(() => {
       const parent = navigation.getParent();
-      parent?.setOptions({tabBarStyle: {display: 'none'}});
-      return () => parent?.setOptions({tabBarStyle: undefined});
+      parent?.setOptions({ tabBarStyle: { display: 'none' } });
+      return () => parent?.setOptions({ tabBarStyle: undefined });
     }, [navigation]),
   );
 
@@ -51,7 +51,7 @@ export default function ChangePasswordScreen() {
     try {
       setLoading(true);
       setError('');
-      const res = await changePasswordApi({currentPassword, newPassword});
+      const res = await changePasswordApi({ currentPassword, newPassword });
       if (res.code === 200) {
         clearToken();
         clearUserInfo();

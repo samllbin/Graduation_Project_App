@@ -1,17 +1,12 @@
-import axios, {AxiosRequestConfig} from 'axios';
-import {
-  clearToken,
-  getToken,
-  notifyAuthExpired,
-  setToken,
-} from '../store/authStore';
+import axios, { AxiosRequestConfig } from 'axios';
+import { clearToken, getToken, notifyAuthExpired, setToken } from '../store/authStore';
 import {
   clearSession,
   getOrCreateDeviceId,
   getStoredRefreshToken,
   updateAccessToken,
 } from '../store/authSession';
-import {AppError} from '../types/http';
+import { AppError } from '../types/http';
 
 type RetryableRequestConfig = AxiosRequestConfig & {
   _retry?: boolean;
@@ -31,7 +26,7 @@ const requestRefreshToken = async (refreshToken: string): Promise<string> => {
   const deviceId = await getOrCreateDeviceId();
   const response = await axios.post(
     `${BASE_URL}/auth/refresh`,
-    {refresh_token: refreshToken},
+    { refresh_token: refreshToken },
     {
       timeout: 10000,
       headers: {
@@ -78,7 +73,7 @@ export const createHttpClient = () => {
   const client = axios.create({
     baseURL: BASE_URL,
     timeout: 10000,
-    headers: {'Content-Type': 'application/json'},
+    headers: { 'Content-Type': 'application/json' },
   });
 
   client.interceptors.request.use(async config => {
@@ -96,11 +91,7 @@ export const createHttpClient = () => {
   client.interceptors.response.use(
     response => {
       const data = response.data;
-      if (
-        typeof data?.code === 'number' &&
-        data.code !== 200 &&
-        data.code !== 201
-      ) {
+      if (typeof data?.code === 'number' && data.code !== 200 && data.code !== 201) {
         return Promise.reject({
           message: data.message || '请求失败',
           code: data.code,

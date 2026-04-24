@@ -1,25 +1,21 @@
 import React from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {agriTheme} from '../theme/agriTheme';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { agriTheme } from '../theme/agriTheme';
 
-type Props = {children: React.ReactNode};
+type Props = { children: React.ReactNode };
 
-export default function AuthLayout({children}: Props) {
+export default function AuthLayout({ children }: Props) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.flex}>
+        style={styles.flex}
+      >
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.scrollContainer}>
+          contentContainerStyle={styles.scrollContainer}
+        >
           <View style={styles.card}>{children}</View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -28,8 +24,8 @@ export default function AuthLayout({children}: Props) {
 }
 
 const styles = StyleSheet.create({
-  flex: {flex: 1},
-  safeArea: {flex: 1, backgroundColor: agriTheme.colors.pageBg},
+  flex: { flex: 1 },
+  safeArea: { flex: 1, backgroundColor: agriTheme.colors.pageBg },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',

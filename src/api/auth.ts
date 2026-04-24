@@ -7,16 +7,15 @@ import {
   SendForgotCodeReq,
   SendRegisterCodeReq,
 } from '../types/auth';
-import {http} from './http';
+import { http } from './http';
 
-const asApiResponse = <T>(promise: Promise<any>) =>
-  promise as Promise<ApiResponse<T>>;
+const asApiResponse = <T>(promise: Promise<any>) => promise as Promise<ApiResponse<T>>;
 
 export const loginApi = (params: LoginReq) =>
   asApiResponse<LoginRes>(http.post('/auth/login', params));
 
 export const refreshTokenApi = (refreshToken: string) =>
-  asApiResponse<{access_token: string}>(
+  asApiResponse<{ access_token: string }>(
     http.post('/auth/refresh', {
       refresh_token: refreshToken,
     }),

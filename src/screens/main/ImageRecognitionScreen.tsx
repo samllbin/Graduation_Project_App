@@ -1,6 +1,6 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import {agriTheme} from '../../theme/agriTheme';
+import { StyleSheet, Text, View } from 'react-native';
+import { agriTheme } from '../../theme/agriTheme';
 
 export default function ImageRecognitionScreen() {
   return (
