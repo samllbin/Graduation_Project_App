@@ -3,7 +3,6 @@ import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
@@ -12,8 +11,11 @@ import ForumScreen from './src/screens/main/ForumScreen';
 import ProfileScreen from './src/screens/main/ProfileScreen';
 import ChangePasswordScreen from './src/screens/main/ChangePasswordScreen';
 import LikedPostsScreen from './src/screens/main/LikedPostsScreen';
+import CreatePostScreen from './src/screens/main/CreatePostScreen';
+import PostDetailScreen from './src/screens/main/PostDetailScreen';
 import ToastMessage from './src/components/ToastMessage';
 import MainTabBar from './src/components/MainTabBar';
+import AppThemeProvider from './src/theme/AppThemeProvider';
 import {
   clearToken,
   clearUserInfo,
@@ -25,38 +27,9 @@ import { clearSession, getSessionTokens, getStoredUserInfo } from './src/store/a
 import { logoutApi } from './src/api/auth';
 import { createTheme } from './src/theme/agriTheme';
 
-const agriTheme = createTheme('light', 1);
+const staticTheme = createTheme('light', 1);
 
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-const ProfileStack = createNativeStackNavigator();
-
-function ProfileStackScreen({ onLogout }: { onLogout: () => void }) {
-  return (
-    <ProfileStack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: agriTheme.colors.pageBg },
-        headerTintColor: agriTheme.colors.primary,
-        headerTitleStyle: { color: agriTheme.colors.textMain, fontWeight: '700' },
-        contentStyle: { backgroundColor: agriTheme.colors.pageBg },
-      }}
-    >
-      <ProfileStack.Screen name="ProfileMain" options={{ headerShown: false }}>
-        {() => <ProfileScreen onLogout={onLogout} />}
-      </ProfileStack.Screen>
-      <ProfileStack.Screen
-        name="ChangePassword"
-        component={ChangePasswordScreen}
-        options={{ title: '修改密码' }}
-      />
-      <ProfileStack.Screen
-        name="LikedPosts"
-        component={LikedPostsScreen}
-        options={{ title: '我点赞的帖子' }}
-      />
-    </ProfileStack.Navigator>
-  );
-}
 
 function HomeTabs({
   onLogout,
@@ -80,7 +53,7 @@ function HomeTabs({
   );
 }
 
-export default function App() {
+function AppInner() {
   const [initializing, setInitializing] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showReloginNotice, setShowReloginNotice] = useState(false);
@@ -126,27 +99,47 @@ export default function App() {
 
   if (initializing) {
     return (
-      <SafeAreaProvider>
-        <View style={styles.container} />
-      </SafeAreaProvider>
+      <View style={styles.container} />
     );
   }
 
   return (
-    <SafeAreaProvider>
+    <>
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{
-            headerStyle: { backgroundColor: agriTheme.colors.pageBg },
-            headerTintColor: agriTheme.colors.primary,
-            headerTitleStyle: { color: agriTheme.colors.textMain, fontWeight: '700' },
-            contentStyle: { backgroundColor: agriTheme.colors.pageBg },
+            headerStyle: { backgroundColor: staticTheme.colors.pageBg },
+            headerTintColor: staticTheme.colors.primary,
+            headerTitleStyle: { color: staticTheme.colors.textMain, fontWeight: '700' },
+            contentStyle: { backgroundColor: staticTheme.colors.pageBg },
           }}
         >
           {isLoggedIn ? (
-            <Stack.Screen name="Home" options={{ headerShown: false }}>
-              {() => <HomeTabs onLogout={onLogout} showLoginSuccess={showLoginSuccess} />}
-            </Stack.Screen>
+            <>
+              <Stack.Screen name="Home" options={{ headerShown: false }}>
+                {() => <HomeTabs onLogout={onLogout} showLoginSuccess={showLoginSuccess} />}
+              </Stack.Screen>
+              <Stack.Screen
+                name="ChangePassword"
+                component={ChangePasswordScreen}
+                options={{ title: '修改密码' }}
+              />
+              <Stack.Screen
+                name="LikedPosts"
+                component={LikedPostsScreen}
+                options={{ title: '我点赞的帖子' }}
+              />
+              <Stack.Screen
+                name="CreatePost"
+                component={CreatePostScreen}
+                options={{ title: '发布帖子' }}
+              />
+              <Stack.Screen
+                name="PostDetail"
+                component={PostDetailScreen}
+                options={{ title: '帖子详情' }}
+              />
+            </>
           ) : (
             <>
               <Stack.Screen name="Login" options={{ headerShown: false }}>
@@ -187,13 +180,23 @@ export default function App() {
           <ToastMessage message="请重新登录" testID="relogin-snackbar" />
         </View>
       )}
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <AppThemeProvider>
+        <AppInner />
+      </AppThemeProvider>
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: agriTheme.colors.pageBg },
-  homeWrap: { flex: 1, backgroundColor: agriTheme.colors.pageBg },
+  container: { flex: 1, backgroundColor: staticTheme.colors.pageBg },
+  homeWrap: { flex: 1, backgroundColor: staticTheme.colors.pageBg },
   homeContent: { flex: 1 },
   toastWrap: {
     position: 'absolute',

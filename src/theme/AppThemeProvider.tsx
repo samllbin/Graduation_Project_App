@@ -19,30 +19,40 @@ export const ThemeContext = createContext<ThemeContextType>({
 });
 
 export default function AppThemeProvider({ children }: { children: React.ReactNode }) {
-  const [fontScale, setFontScaleState] = useState<FontScale>(1);
-  const [themeMode, setThemeModeState] = useState<ThemeMode>('light');
+  const [state, setState] = useState<{ fontScale: FontScale; themeMode: ThemeMode }>({
+    fontScale: 1,
+    themeMode: 'light',
+  });
   useEffect(() => {
     (async () => {
       const [fs, tm] = await Promise.all([loadFontScale(), loadThemeMode()]);
-      setFontScaleState(fs);
-      setThemeModeState(tm);
+      setState(prev => {
+        if (prev.fontScale === fs && prev.themeMode === tm) return prev;
+        return { fontScale: fs, themeMode: tm };
+      });
     })();
   }, []);
 
   const setFontScale = useCallback((v: FontScale) => {
-    setFontScaleState(v);
+    setState(s => ({ ...s, fontScale: v }));
     saveFontScale(v);
   }, []);
 
   const setThemeMode = useCallback((v: ThemeMode) => {
-    setThemeModeState(v);
+    setState(s => ({ ...s, themeMode: v }));
     saveThemeMode(v);
   }, []);
 
+  const { fontScale, themeMode } = state;
   const theme = useMemo(() => createTheme(themeMode, fontScale), [themeMode, fontScale]);
 
+  const value = useMemo(
+    () => ({ theme, fontScale, themeMode, setFontScale, setThemeMode }),
+    [theme, fontScale, themeMode, setFontScale, setThemeMode],
+  );
+
   return (
-    <ThemeContext.Provider value={{ theme, fontScale, themeMode, setFontScale, setThemeMode }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

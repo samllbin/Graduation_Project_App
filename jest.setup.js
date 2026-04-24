@@ -1,5 +1,7 @@
 const mockSessionStore = new Map();
 
+const mockFocusEffectCalled = new WeakSet();
+
 jest.mock('@react-navigation/native', () => {
   const actual = jest.requireActual('@react-navigation/native');
   return {
@@ -11,15 +13,32 @@ jest.mock('@react-navigation/native', () => {
       goBack: jest.fn(),
       getParent: jest.fn(() => ({setOptions: jest.fn()})),
     }),
-    useFocusEffect: jest.fn((cb) => cb()),
+    useRoute: jest.fn(() => ({ name: 'Mock', params: {} })),
+    useFocusEffect: jest.fn((cb) => {
+      if (!mockFocusEffectCalled.has(cb)) {
+        mockFocusEffectCalled.add(cb);
+        cb();
+      }
+    }),
   };
 });
 
 jest.mock('@react-navigation/native-stack', () => ({
   createNativeStackNavigator: () => ({
-    Navigator: ({children}: any) => {
+    Navigator: ({children, initialRouteName}: any) => {
       const ReactLib = require('react');
-      return ReactLib.createElement('div', null, children);
+      const screens = ReactLib.Children.toArray(children);
+      const active = screens.find((s) => s.props?.name === initialRouteName) || screens[0];
+      if (!active) return null;
+
+      const {children: renderFn, component: Component} = active.props;
+      if (typeof renderFn === 'function') {
+        return renderFn({navigation: {navigate: jest.fn(), replace: jest.fn(), goBack: jest.fn()}});
+      }
+      if (Component) {
+        return ReactLib.createElement(Component, {navigation: {navigate: jest.fn(), replace: jest.fn(), goBack: jest.fn()}});
+      }
+      return active.props.children || null;
     },
     Screen: ({children, component: Component}: any) => {
       const ReactLib = require('react');
