@@ -5,7 +5,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import { updateProfileApi, uploadImageApi } from '../../api/user';
 import { setUserInfo } from '../../store/authStore';
 import { updateStoredUserInfo } from '../../store/authSession';
-import { agriTheme } from '../../theme/agriTheme';
+import { useTheme } from '../../theme/useTheme';
 
 type Props = {
   userName: string;
@@ -15,6 +15,7 @@ type Props = {
 };
 
 export default function ProfileHeader({ userName, avatar, signature, onUpdate }: Props) {
+  const theme = useTheme();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(signature);
   const [uploading, setUploading] = useState(false);
@@ -63,6 +64,42 @@ export default function ProfileHeader({ userName, avatar, signature, onUpdate }:
       await saveField({ signature: draft });
     }
   };
+
+  const styles = StyleSheet.create({
+    wrap: { alignItems: 'center', marginBottom: theme.spacing.xl },
+    avatarContainer: { backgroundColor: theme.colors.border },
+    avatarImage: { resizeMode: 'cover' },
+    name: {
+      marginTop: theme.spacing.md,
+      fontSize: Math.round(20 * theme.fontScale),
+      fontWeight: '700',
+      color: theme.colors.textMain,
+    },
+    signature: {
+      marginTop: theme.spacing.xs,
+      fontSize: Math.round(14 * theme.fontScale),
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+    },
+    hint: { marginTop: 2, fontSize: 12, color: theme.colors.primary, textAlign: 'center' },
+    editWrap: { marginTop: theme.spacing.sm, width: '100%', alignItems: 'center' },
+    input: {
+      width: '100%',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: theme.radius.md,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      fontSize: Math.round(14 * theme.fontScale),
+      color: theme.colors.textMain,
+      backgroundColor: theme.colors.cardBg,
+      textAlign: 'center',
+      minHeight: 60,
+    },
+    actions: { flexDirection: 'row', marginTop: theme.spacing.xs, gap: theme.spacing.lg },
+    confirm: { color: theme.colors.primary, fontWeight: '600', fontSize: Math.round(14 * theme.fontScale) },
+    cancel: { color: theme.colors.textSecondary, fontSize: Math.round(14 * theme.fontScale) },
+  });
 
   return (
     <View style={styles.wrap}>
@@ -113,39 +150,3 @@ export default function ProfileHeader({ userName, avatar, signature, onUpdate }:
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: { alignItems: 'center', marginBottom: agriTheme.spacing.xl },
-  avatarContainer: { backgroundColor: agriTheme.colors.border },
-  avatarImage: { resizeMode: 'cover' },
-  name: {
-    marginTop: agriTheme.spacing.md,
-    fontSize: 20,
-    fontWeight: '700',
-    color: agriTheme.colors.textMain,
-  },
-  signature: {
-    marginTop: agriTheme.spacing.xs,
-    fontSize: 14,
-    color: agriTheme.colors.textSecondary,
-    textAlign: 'center',
-  },
-  hint: { marginTop: 2, fontSize: 12, color: agriTheme.colors.primary, textAlign: 'center' },
-  editWrap: { marginTop: agriTheme.spacing.sm, width: '100%', alignItems: 'center' },
-  input: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: agriTheme.colors.border,
-    borderRadius: agriTheme.radius.md,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 14,
-    color: agriTheme.colors.textMain,
-    backgroundColor: agriTheme.colors.cardBg,
-    textAlign: 'center',
-    minHeight: 60,
-  },
-  actions: { flexDirection: 'row', marginTop: agriTheme.spacing.xs, gap: agriTheme.spacing.lg },
-  confirm: { color: agriTheme.colors.primary, fontWeight: '600', fontSize: 14 },
-  cancel: { color: agriTheme.colors.textSecondary, fontSize: 14 },
-});

@@ -5,7 +5,7 @@ import { loginApi } from '../../api/auth';
 import { setToken, setUserInfo } from '../../store/authStore';
 import { saveSession } from '../../store/authSession';
 import { validateLoginInput } from './validators';
-import { agriTheme } from '../../theme/agriTheme';
+import { useTheme } from '../../theme/useTheme';
 
 type Props = {
   onGotoRegister: () => void;
@@ -14,6 +14,7 @@ type Props = {
 };
 
 export default function LoginScreen({ onGotoRegister, onGotoForgot, onLoginSuccess }: Props) {
+  const theme = useTheme();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -54,6 +55,38 @@ export default function LoginScreen({ onGotoRegister, onGotoForgot, onLoginSucce
     }
   };
 
+  const styles = StyleSheet.create({
+    title: theme.text.title,
+    subtitle: { ...theme.text.subtitle, marginTop: 6, marginBottom: 16 },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: theme.radius.md,
+      paddingHorizontal: 12,
+      paddingVertical: 11,
+      marginBottom: 12,
+      fontSize: Math.round(15 * theme.fontScale),
+      color: theme.colors.textMain,
+      backgroundColor: theme.colors.cardBg,
+    },
+    error: { color: theme.colors.danger, marginBottom: 10 },
+    primaryButton: {
+      marginTop: 2,
+      backgroundColor: theme.colors.primary,
+      height: 46,
+      borderRadius: theme.radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    primaryButtonText: { color: '#fff', fontSize: Math.round(16 * theme.fontScale), fontWeight: '600' },
+    linkRow: {
+      marginTop: 14,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    link: { color: theme.colors.primary, fontSize: Math.round(14 * theme.fontScale), fontWeight: '600' },
+  });
+
   return (
     <AuthLayout>
       <Text style={styles.title}>登录</Text>
@@ -62,7 +95,7 @@ export default function LoginScreen({ onGotoRegister, onGotoForgot, onLoginSucce
       <TextInput
         style={styles.input}
         placeholder="账号（用户名或邮箱）"
-        placeholderTextColor="#93a19a"
+        placeholderTextColor={theme.colors.textSecondary}
         value={login}
         onChangeText={setLogin}
         autoCapitalize="none"
@@ -70,7 +103,7 @@ export default function LoginScreen({ onGotoRegister, onGotoForgot, onLoginSucce
       <TextInput
         style={styles.input}
         placeholder="密码"
-        placeholderTextColor="#93a19a"
+        placeholderTextColor={theme.colors.textSecondary}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -97,35 +130,3 @@ export default function LoginScreen({ onGotoRegister, onGotoForgot, onLoginSucce
     </AuthLayout>
   );
 }
-
-const styles = StyleSheet.create({
-  title: agriTheme.text.title,
-  subtitle: { ...agriTheme.text.subtitle, marginTop: 6, marginBottom: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: agriTheme.colors.border,
-    borderRadius: agriTheme.radius.md,
-    paddingHorizontal: 12,
-    paddingVertical: 11,
-    marginBottom: 12,
-    fontSize: 15,
-    color: agriTheme.colors.textMain,
-    backgroundColor: '#fbfdfb',
-  },
-  error: { color: agriTheme.colors.danger, marginBottom: 10 },
-  primaryButton: {
-    marginTop: 2,
-    backgroundColor: agriTheme.colors.primary,
-    height: 46,
-    borderRadius: agriTheme.radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  linkRow: {
-    marginTop: 14,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  link: { color: agriTheme.colors.primary, fontSize: 14, fontWeight: '600' },
-});

@@ -23,7 +23,9 @@ import {
 } from './src/store/authStore';
 import { clearSession, getSessionTokens, getStoredUserInfo } from './src/store/authSession';
 import { logoutApi } from './src/api/auth';
-import { agriTheme } from './src/theme/agriTheme';
+import { createTheme } from './src/theme/agriTheme';
+
+const agriTheme = createTheme('light', 1);
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();

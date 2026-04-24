@@ -2,22 +2,21 @@ import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Avatar } from '@rneui/themed';
 import { PostItem } from '../../types';
-import { agriTheme } from '../../theme/agriTheme';
+import { useTheme } from '../../theme/useTheme';
 
 type Props = {
   post: PostItem;
   onLikeToggle?: (postId: number, liked: boolean) => void;
+  onPress?: (post: PostItem) => void;
 };
 
-export default function PostCard({ post, onLikeToggle }: Props) {
-  const [liked, setLiked] = useState(!!post.liked);
-  const [likeCount, setLikeCount] = useState(post.likeCount);
+export default function PostCard({ post, onLikeToggle, onPress }: Props) {
+  const theme = useTheme();
+  const liked = !!post.liked;
+  const likeCount = post.likeCount;
 
-  const handleLike = async () => {
-    const nextLiked = !liked;
-    setLiked(nextLiked);
-    setLikeCount(prev => (nextLiked ? prev + 1 : Math.max(prev - 1, 0)));
-    onLikeToggle?.(post.id, nextLiked);
+  const handleLike = () => {
+    onLikeToggle?.(Number(post.id), !liked);
   };
 
   const avatarSource = post.author?.avatar
@@ -26,8 +25,72 @@ export default function PostCard({ post, onLikeToggle }: Props) {
         uri: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=default%20user%20avatar&size=128x128',
       };
 
+  const styles = StyleSheet.create({
+    card: {
+      backgroundColor: theme.colors.cardBg,
+      borderRadius: theme.radius.lg,
+      marginBottom: theme.spacing.md,
+      overflow: 'hidden',
+    },
+    cover: {
+      width: '100%',
+      height: 160,
+      backgroundColor: theme.colors.border,
+    },
+    body: {
+      padding: theme.spacing.md,
+    },
+    title: {
+      fontSize: Math.round(16 * theme.fontScale),
+      fontWeight: '700',
+      color: theme.colors.textMain,
+      marginBottom: theme.spacing.xs,
+    },
+    text: {
+      fontSize: Math.round(14 * theme.fontScale),
+      color: theme.colors.textSecondary,
+      lineHeight: Math.round(20 * theme.fontScale),
+      marginBottom: theme.spacing.sm,
+    },
+    footer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: theme.spacing.xs,
+    },
+    author: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.xs,
+      flex: 1,
+    },
+    authorName: {
+      fontSize: Math.round(13 * theme.fontScale),
+      color: theme.colors.textSecondary,
+    },
+    likeWrap: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    likeIcon: {
+      fontSize: 16,
+    },
+    likeIconActive: {
+      color: theme.colors.danger,
+    },
+    likeCount: {
+      fontSize: Math.round(13 * theme.fontScale),
+      color: theme.colors.textSecondary,
+    },
+    likeCountActive: {
+      color: theme.colors.danger,
+      fontWeight: '600',
+    },
+  });
+
   return (
-    <View style={styles.card}>
+    <Pressable style={styles.card} onPress={() => onPress?.(post)}>
       {post.coverImageUrl && <Image source={{ uri: post.coverImageUrl }} style={styles.cover} />}
 
       <View style={styles.body}>
@@ -58,70 +121,6 @@ export default function PostCard({ post, onLikeToggle }: Props) {
           </Pressable>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: agriTheme.colors.cardBg,
-    borderRadius: agriTheme.radius.lg,
-    marginBottom: agriTheme.spacing.md,
-    overflow: 'hidden',
-  },
-  cover: {
-    width: '100%',
-    height: 160,
-    backgroundColor: agriTheme.colors.border,
-  },
-  body: {
-    padding: agriTheme.spacing.md,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: agriTheme.colors.textMain,
-    marginBottom: agriTheme.spacing.xs,
-  },
-  text: {
-    fontSize: 14,
-    color: agriTheme.colors.textSecondary,
-    lineHeight: 20,
-    marginBottom: agriTheme.spacing.sm,
-  },
-  footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: agriTheme.spacing.xs,
-  },
-  author: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: agriTheme.spacing.xs,
-    flex: 1,
-  },
-  authorName: {
-    fontSize: 13,
-    color: agriTheme.colors.textSecondary,
-  },
-  likeWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  likeIcon: {
-    fontSize: 16,
-  },
-  likeIconActive: {
-    color: agriTheme.colors.danger,
-  },
-  likeCount: {
-    fontSize: 13,
-    color: agriTheme.colors.textSecondary,
-  },
-  likeCountActive: {
-    color: agriTheme.colors.danger,
-    fontWeight: '600',
-  },
-});

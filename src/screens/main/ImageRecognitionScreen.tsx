@@ -1,8 +1,30 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { agriTheme } from '../../theme/agriTheme';
+import { useTheme } from '../../theme/useTheme';
 
 export default function ImageRecognitionScreen() {
+  const theme = useTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.pageBg,
+      paddingHorizontal: theme.spacing.lg,
+    },
+    title: {
+      fontSize: Math.round(24 * theme.fontScale),
+      fontWeight: '700',
+      color: theme.colors.textMain,
+    },
+    subtitle: {
+      marginTop: theme.spacing.sm,
+      color: theme.colors.textSecondary,
+      fontSize: Math.round(14 * theme.fontScale),
+    },
+  });
+
   return (
     <View style={styles.container} testID="home-screen">
       <Text style={styles.title}>图像识别页</Text>
@@ -10,23 +32,3 @@ export default function ImageRecognitionScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: agriTheme.colors.pageBg,
-    paddingHorizontal: agriTheme.spacing.lg,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: agriTheme.colors.textMain,
-  },
-  subtitle: {
-    marginTop: agriTheme.spacing.sm,
-    color: agriTheme.colors.textSecondary,
-    fontSize: 14,
-  },
-});

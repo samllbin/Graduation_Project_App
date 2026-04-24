@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { ListItem } from '@rneui/themed';
-import { agriTheme } from '../../theme/agriTheme';
+import { useTheme } from '../../theme/useTheme';
 
 type MenuItem = {
   label: string;
@@ -14,6 +14,28 @@ type Props = {
 };
 
 export default function ProfileMenu({ items }: Props) {
+  const theme = useTheme();
+
+  const styles = StyleSheet.create({
+    item: {
+      backgroundColor: theme.colors.cardBg,
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.md,
+    },
+    first: {
+      borderTopLeftRadius: theme.radius.lg,
+      borderTopRightRadius: theme.radius.lg,
+    },
+    last: {
+      borderBottomLeftRadius: theme.radius.lg,
+      borderBottomRightRadius: theme.radius.lg,
+    },
+    title: {
+      fontSize: Math.round(15 * theme.fontScale),
+      color: theme.colors.textMain,
+    },
+  });
+
   return (
     <>
       {items.map((item, index) => (
@@ -38,23 +60,3 @@ export default function ProfileMenu({ items }: Props) {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  item: {
-    backgroundColor: agriTheme.colors.cardBg,
-    paddingHorizontal: agriTheme.spacing.lg,
-    paddingVertical: agriTheme.spacing.md,
-  },
-  first: {
-    borderTopLeftRadius: agriTheme.radius.lg,
-    borderTopRightRadius: agriTheme.radius.lg,
-  },
-  last: {
-    borderBottomLeftRadius: agriTheme.radius.lg,
-    borderBottomRightRadius: agriTheme.radius.lg,
-  },
-  title: {
-    fontSize: 15,
-    color: agriTheme.colors.textMain,
-  },
-});

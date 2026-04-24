@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { mainTabItems, MainTabKey } from '../config/mainTabs';
-import { agriTheme } from '../theme/agriTheme';
+import { useTheme } from '../theme/useTheme';
 
 type Props = {
   activeTab: MainTabKey;
@@ -9,6 +9,41 @@ type Props = {
 };
 
 export default function MainTabBar({ activeTab, onChangeTab }: Props) {
+  const theme = useTheme();
+
+  const styles = StyleSheet.create({
+    wrap: {
+      flexDirection: 'row',
+      backgroundColor: theme.colors.tabBg,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.border,
+      paddingTop: 8,
+      paddingBottom: 10,
+    },
+    tabItem: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 2,
+    },
+    icon: {
+      fontSize: 18,
+      color: theme.colors.tabInactive,
+    },
+    iconFocused: {
+      color: theme.colors.tabActive,
+    },
+    label: {
+      fontSize: 12,
+      color: theme.colors.tabInactive,
+      fontWeight: '500',
+    },
+    labelFocused: {
+      color: theme.colors.tabActive,
+      fontWeight: '700',
+    },
+  });
+
   return (
     <View style={styles.wrap}>
       {mainTabItems.map(item => {
@@ -23,36 +58,3 @@ export default function MainTabBar({ activeTab, onChangeTab }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: {
-    flexDirection: 'row',
-    backgroundColor: agriTheme.colors.tabBg,
-    borderTopWidth: 1,
-    borderTopColor: agriTheme.colors.border,
-    paddingTop: 8,
-    paddingBottom: 10,
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 2,
-  },
-  icon: {
-    fontSize: 18,
-    color: agriTheme.colors.tabInactive,
-  },
-  iconFocused: {
-    color: agriTheme.colors.tabActive,
-  },
-  label: {
-    fontSize: 12,
-    color: agriTheme.colors.tabInactive,
-    fontWeight: '500',
-  },
-  labelFocused: {
-    color: agriTheme.colors.tabActive,
-    fontWeight: '700',
-  },
-});

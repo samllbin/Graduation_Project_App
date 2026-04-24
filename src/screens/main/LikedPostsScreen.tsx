@@ -12,9 +12,10 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import PostCard from '../../components/post/PostCard';
 import { getLikedPostsApi, unlikePostApi } from '../../api/post';
 import { PostItem } from '../../types';
-import { agriTheme } from '../../theme/agriTheme';
+import { useTheme } from '../../theme/useTheme';
 
 export default function LikedPostsScreen() {
+  const theme = useTheme();
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -23,14 +24,6 @@ export default function LikedPostsScreen() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
   const navigation = useNavigation<any>();
-
-  useFocusEffect(
-    useCallback(() => {
-      const parent = navigation.getParent();
-      parent?.setOptions({ tabBarStyle: { display: 'none' } });
-      return () => parent?.setOptions({ tabBarStyle: undefined });
-    }, [navigation]),
-  );
 
   const fetch = async (targetPage: number, isRefresh = false) => {
     try {
@@ -72,20 +65,45 @@ export default function LikedPostsScreen() {
   const handleLikeToggle = async (postId: number, liked: boolean) => {
     if (!liked) {
       try {
-        await unlikePostApi(postId);
-        setPosts(prev => prev.filter(p => p.id !== postId));
+        await unlikePostApi(Number(postId));
+        setPosts(prev => prev.filter(p => Number(p.id) !== Number(postId)));
       } catch {}
     }
   };
 
+  const handlePostPress = (post: PostItem) => {
+    navigation.navigate('PostDetail', { postId: post.id });
+  };
+
   const renderItem = ({ item }: { item: PostItem }) => (
-    <PostCard post={item} onLikeToggle={handleLikeToggle} />
+    <PostCard post={item} onLikeToggle={handleLikeToggle} onPress={handlePostPress} />
   );
+
+  const styles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme.colors.pageBg },
+    center: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: theme.spacing.lg,
+    },
+    list: { padding: theme.spacing.lg, paddingBottom: theme.spacing.xl },
+    error: { color: theme.colors.danger, marginBottom: theme.spacing.md },
+    retry: {
+      backgroundColor: theme.colors.primarySoft,
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: theme.radius.md,
+    },
+    retryText: { color: theme.colors.primary, fontWeight: '600' },
+    footer: { marginVertical: theme.spacing.md },
+    empty: { color: theme.colors.textSecondary, fontSize: 15 },
+  });
 
   if (loading && posts.length === 0) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator color={agriTheme.colors.primary} />
+        <ActivityIndicator color={theme.colors.primary} />
       </View>
     );
   }
@@ -111,7 +129,7 @@ export default function LikedPostsScreen() {
         onEndReachedThreshold={0.3}
         ListFooterComponent={
           loadingMore ? (
-            <ActivityIndicator style={styles.footer} color={agriTheme.colors.primary} />
+            <ActivityIndicator style={styles.footer} color={theme.colors.primary} />
           ) : null
         }
         ListEmptyComponent={
@@ -125,24 +143,3 @@ export default function LikedPostsScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: agriTheme.colors.pageBg },
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: agriTheme.spacing.lg,
-  },
-  list: { padding: agriTheme.spacing.lg, paddingBottom: agriTheme.spacing.xl },
-  error: { color: agriTheme.colors.danger, marginBottom: agriTheme.spacing.md },
-  retry: {
-    backgroundColor: agriTheme.colors.primarySoft,
-    paddingHorizontal: agriTheme.spacing.lg,
-    paddingVertical: agriTheme.spacing.sm,
-    borderRadius: agriTheme.radius.md,
-  },
-  retryText: { color: agriTheme.colors.primary, fontWeight: '600' },
-  footer: { marginVertical: agriTheme.spacing.md },
-  empty: { color: agriTheme.colors.textSecondary, fontSize: 15 },
-});

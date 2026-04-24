@@ -1,34 +1,29 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { Input, Button } from '@rneui/themed';
 import { changePasswordApi } from '../../api/user';
 import { clearToken, clearUserInfo } from '../../store/authStore';
 import { clearSession } from '../../store/authSession';
-import { agriTheme } from '../../theme/agriTheme';
+import { useTheme } from '../../theme/useTheme';
 
 type RootStackParamList = {
-  Login: undefined;
   ForgotPassword: undefined;
 };
 
-export default function ChangePasswordScreen() {
+type Props = {
+  onSuccess?: () => void;
+};
+
+export default function ChangePasswordScreen({ onSuccess }: Props) {
+  const theme = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  useFocusEffect(
-    useCallback(() => {
-      const parent = navigation.getParent();
-      parent?.setOptions({ tabBarStyle: { display: 'none' } });
-      return () => parent?.setOptions({ tabBarStyle: undefined });
-    }, [navigation]),
-  );
 
   const onSubmit = async () => {
     if (!currentPassword) {
@@ -56,7 +51,7 @@ export default function ChangePasswordScreen() {
         clearToken();
         clearUserInfo();
         await clearSession();
-        navigation.navigate('Login');
+        onSuccess?.();
       } else {
         setError(res.message || '修改失败');
       }
@@ -66,6 +61,57 @@ export default function ChangePasswordScreen() {
       setLoading(false);
     }
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.pageBg,
+    },
+    form: {
+      paddingHorizontal: theme.spacing.lg,
+      paddingTop: theme.spacing.xl,
+    },
+    inputContainer: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: theme.radius.md,
+      paddingHorizontal: 12,
+      backgroundColor: theme.colors.cardBg,
+    },
+    inputText: {
+      fontSize: Math.round(15 * theme.fontScale),
+      color: theme.colors.textMain,
+    },
+    label: {
+      fontSize: Math.round(14 * theme.fontScale),
+      fontWeight: '600',
+      color: theme.colors.textMain,
+      marginBottom: 6,
+    },
+    error: {
+      color: theme.colors.danger,
+      marginBottom: theme.spacing.md,
+      fontSize: Math.round(14 * theme.fontScale),
+    },
+    primaryButton: {
+      backgroundColor: theme.colors.primary,
+      height: 46,
+      borderRadius: theme.radius.md,
+    },
+    primaryButtonText: {
+      fontSize: Math.round(16 * theme.fontScale),
+      fontWeight: '600',
+    },
+    footer: {
+      marginTop: theme.spacing.lg,
+      alignItems: 'center',
+    },
+    link: {
+      color: theme.colors.primary,
+      fontSize: Math.round(14 * theme.fontScale),
+      fontWeight: '600',
+    },
+  });
 
   return (
     <View style={styles.container}>
@@ -79,6 +125,7 @@ export default function ChangePasswordScreen() {
           inputContainerStyle={styles.inputContainer}
           inputStyle={styles.inputText}
           labelStyle={styles.label}
+          placeholderTextColor={theme.colors.textSecondary}
         />
         <Input
           label="新密码"
@@ -89,6 +136,7 @@ export default function ChangePasswordScreen() {
           inputContainerStyle={styles.inputContainer}
           inputStyle={styles.inputText}
           labelStyle={styles.label}
+          placeholderTextColor={theme.colors.textSecondary}
         />
         <Input
           label="确认新密码"
@@ -99,6 +147,7 @@ export default function ChangePasswordScreen() {
           inputContainerStyle={styles.inputContainer}
           inputStyle={styles.inputText}
           labelStyle={styles.label}
+          placeholderTextColor={theme.colors.textSecondary}
         />
 
         {!!error && <Text style={styles.error}>{error}</Text>}
@@ -121,54 +170,3 @@ export default function ChangePasswordScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: agriTheme.colors.pageBg,
-  },
-  form: {
-    paddingHorizontal: agriTheme.spacing.lg,
-    paddingTop: agriTheme.spacing.xl,
-  },
-  inputContainer: {
-    borderWidth: 1,
-    borderColor: agriTheme.colors.border,
-    borderRadius: agriTheme.radius.md,
-    paddingHorizontal: 12,
-    backgroundColor: '#fbfdfb',
-  },
-  inputText: {
-    fontSize: 15,
-    color: agriTheme.colors.textMain,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: agriTheme.colors.textMain,
-    marginBottom: 6,
-  },
-  error: {
-    color: agriTheme.colors.danger,
-    marginBottom: agriTheme.spacing.md,
-    fontSize: 14,
-  },
-  primaryButton: {
-    backgroundColor: agriTheme.colors.primary,
-    height: 46,
-    borderRadius: agriTheme.radius.md,
-  },
-  primaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  footer: {
-    marginTop: agriTheme.spacing.lg,
-    alignItems: 'center',
-  },
-  link: {
-    color: agriTheme.colors.primary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-});

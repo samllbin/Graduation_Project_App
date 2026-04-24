@@ -1,11 +1,35 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { agriTheme } from '../theme/agriTheme';
+import { useTheme } from '../theme/useTheme';
 
 type Props = { children: React.ReactNode };
 
 export default function AuthLayout({ children }: Props) {
+  const theme = useTheme();
+
+  const styles = StyleSheet.create({
+    flex: { flex: 1 },
+    safeArea: { flex: 1, backgroundColor: theme.colors.pageBg },
+    scrollContainer: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.xl,
+    },
+    card: {
+      backgroundColor: theme.colors.cardBg,
+      borderRadius: theme.radius.lg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      padding: theme.spacing.lg,
+      shadowColor: '#1f2937',
+      shadowOpacity: 0.06,
+      shadowRadius: 10,
+      elevation: 3,
+    },
+  });
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -22,25 +46,3 @@ export default function AuthLayout({ children }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  safeArea: { flex: 1, backgroundColor: agriTheme.colors.pageBg },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: agriTheme.spacing.lg,
-    paddingVertical: agriTheme.spacing.xl,
-  },
-  card: {
-    backgroundColor: agriTheme.colors.cardBg,
-    borderRadius: agriTheme.radius.lg,
-    borderWidth: 1,
-    borderColor: agriTheme.colors.border,
-    padding: agriTheme.spacing.lg,
-    shadowColor: '#1f2937',
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 3,
-  },
-});

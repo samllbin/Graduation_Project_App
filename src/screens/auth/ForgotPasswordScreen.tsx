@@ -3,13 +3,14 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 
 import AuthLayout from '../../components/AuthLayout';
 import { resetForgotPasswordApi, sendForgotCodeApi } from '../../api/auth';
 import { validateForgotInput } from './validators';
-import { agriTheme } from '../../theme/agriTheme';
+import { useTheme } from '../../theme/useTheme';
 
 type Props = {
   onBackLogin: () => void;
 };
 
 export default function ForgotPasswordScreen({ onBackLogin }: Props) {
+  const theme = useTheme();
   const [login, setLogin] = useState('');
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -82,6 +83,57 @@ export default function ForgotPasswordScreen({ onBackLogin }: Props) {
 
   const sendCodeLabel = countdown > 0 ? `${countdown}s` : '发送验证码';
 
+  const styles = StyleSheet.create({
+    title: theme.text.title,
+    subtitle: { ...theme.text.subtitle, marginTop: 6, marginBottom: 16 },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: theme.radius.md,
+      paddingHorizontal: 12,
+      paddingVertical: 11,
+      marginBottom: 12,
+      fontSize: Math.round(15 * theme.fontScale),
+      color: theme.colors.textMain,
+      backgroundColor: theme.colors.cardBg,
+    },
+    codeRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+    codeInput: { flex: 1, marginBottom: 0 },
+    codeButton: {
+      marginLeft: 8,
+      height: 44,
+      borderRadius: theme.radius.md,
+      borderWidth: 1,
+      borderColor: theme.colors.primary,
+      paddingHorizontal: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.primarySoft,
+    },
+    codeButtonDisabled: {
+      borderColor: '#9acbaa',
+      backgroundColor: '#f1f8f2',
+    },
+    codeButtonText: {
+      color: theme.colors.primary,
+      fontWeight: '600',
+      fontSize: 13,
+    },
+    error: { color: theme.colors.danger, marginBottom: 10 },
+    success: { color: theme.colors.success, marginBottom: 10 },
+    primaryButton: {
+      marginTop: 2,
+      backgroundColor: theme.colors.primary,
+      height: 46,
+      borderRadius: theme.radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    primaryButtonText: { color: '#fff', fontSize: Math.round(16 * theme.fontScale), fontWeight: '600' },
+    backLinkWrap: { marginTop: 14, alignSelf: 'center' },
+    link: { color: theme.colors.primary, fontSize: Math.round(14 * theme.fontScale), fontWeight: '600' },
+  });
+
   return (
     <AuthLayout>
       <Text style={styles.title}>找回密码</Text>
@@ -90,7 +142,7 @@ export default function ForgotPasswordScreen({ onBackLogin }: Props) {
       <TextInput
         style={styles.input}
         placeholder="账号名/邮箱"
-        placeholderTextColor="#93a19a"
+        placeholderTextColor={theme.colors.textSecondary}
         value={login}
         onChangeText={setLogin}
         autoCapitalize="none"
@@ -100,7 +152,7 @@ export default function ForgotPasswordScreen({ onBackLogin }: Props) {
         <TextInput
           style={[styles.input, styles.codeInput]}
           placeholder="验证码"
-          placeholderTextColor="#93a19a"
+          placeholderTextColor={theme.colors.textSecondary}
           value={code}
           onChangeText={setCode}
         />
@@ -110,7 +162,7 @@ export default function ForgotPasswordScreen({ onBackLogin }: Props) {
           disabled={sendingCode || countdown > 0}
         >
           {sendingCode ? (
-            <ActivityIndicator color={agriTheme.colors.primary} />
+            <ActivityIndicator color={theme.colors.primary} />
           ) : (
             <Text style={styles.codeButtonText}>{sendCodeLabel}</Text>
           )}
@@ -120,7 +172,7 @@ export default function ForgotPasswordScreen({ onBackLogin }: Props) {
       <TextInput
         style={styles.input}
         placeholder="新密码"
-        placeholderTextColor="#93a19a"
+        placeholderTextColor={theme.colors.textSecondary}
         value={newPassword}
         onChangeText={setNewPassword}
         secureTextEntry
@@ -143,54 +195,3 @@ export default function ForgotPasswordScreen({ onBackLogin }: Props) {
     </AuthLayout>
   );
 }
-
-const styles = StyleSheet.create({
-  title: agriTheme.text.title,
-  subtitle: { ...agriTheme.text.subtitle, marginTop: 6, marginBottom: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: agriTheme.colors.border,
-    borderRadius: agriTheme.radius.md,
-    paddingHorizontal: 12,
-    paddingVertical: 11,
-    marginBottom: 12,
-    fontSize: 15,
-    color: agriTheme.colors.textMain,
-    backgroundColor: '#fbfdfb',
-  },
-  codeRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  codeInput: { flex: 1, marginBottom: 0 },
-  codeButton: {
-    marginLeft: 8,
-    height: 44,
-    borderRadius: agriTheme.radius.md,
-    borderWidth: 1,
-    borderColor: agriTheme.colors.primary,
-    paddingHorizontal: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: agriTheme.colors.primarySoft,
-  },
-  codeButtonDisabled: {
-    borderColor: '#9acbaa',
-    backgroundColor: '#f1f8f2',
-  },
-  codeButtonText: {
-    color: agriTheme.colors.primary,
-    fontWeight: '600',
-    fontSize: 13,
-  },
-  error: { color: agriTheme.colors.danger, marginBottom: 10 },
-  success: { color: agriTheme.colors.success, marginBottom: 10 },
-  primaryButton: {
-    marginTop: 2,
-    backgroundColor: agriTheme.colors.primary,
-    height: 46,
-    borderRadius: agriTheme.radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  backLinkWrap: { marginTop: 14, alignSelf: 'center' },
-  link: { color: agriTheme.colors.primary, fontSize: 14, fontWeight: '600' },
-});
