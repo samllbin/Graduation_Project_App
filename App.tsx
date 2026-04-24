@@ -119,11 +119,9 @@ function AppInner() {
               <Stack.Screen name="Home" options={{ headerShown: false }}>
                 {() => <HomeTabs onLogout={onLogout} showLoginSuccess={showLoginSuccess} />}
               </Stack.Screen>
-              <Stack.Screen
-                name="ChangePassword"
-                component={ChangePasswordScreen}
-                options={{ title: '修改密码' }}
-              />
+              <Stack.Screen name="ChangePassword" options={{ title: '修改密码' }}>
+                {() => <ChangePasswordScreen onSuccess={onLogout} />}
+              </Stack.Screen>
               <Stack.Screen
                 name="LikedPosts"
                 component={LikedPostsScreen}
