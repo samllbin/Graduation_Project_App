@@ -67,6 +67,7 @@ export default function ForumScreen() {
   const [showSortPicker, setShowSortPicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showImagePicker, setShowImagePicker] = useState(false);
+  const [likingPostId, setLikingPostId] = useState<number | null>(null);
 
   const closeAllPickers = () => {
     setShowSortPicker(false);
@@ -133,6 +134,8 @@ export default function ForumScreen() {
 
   const handleLikeToggle = async (postId: number, liked: boolean) => {
     const id = Number(postId);
+    if (likingPostId === id) return;
+    setLikingPostId(id);
     try {
       if (liked) {
         await likePostApi(id);
@@ -147,6 +150,9 @@ export default function ForumScreen() {
         ),
       );
     } catch {}
+    finally {
+      setLikingPostId(null);
+    }
   };
 
   const handlePostPress = (post: PostItem) => {
@@ -365,7 +371,7 @@ export default function ForumScreen() {
         onClose={() => setShowSortPicker(false)}
         options={sortOptions}
         value={sortBy}
-        onSelect={setSortBy}
+        onSelect={(v) => setSortBy(v as string)}
         title="排序方式"
       />
       <FilterPicker
@@ -373,7 +379,7 @@ export default function ForumScreen() {
         onClose={() => setShowTimePicker(false)}
         options={timeOptions}
         value={timeRange}
-        onSelect={setTimeRange}
+        onSelect={(v) => setTimeRange(v)}
         title="时间筛选"
       />
       <FilterPicker
@@ -381,7 +387,7 @@ export default function ForumScreen() {
         onClose={() => setShowImagePicker(false)}
         options={imageOptions}
         value={hasImage}
-        onSelect={setHasImage}
+        onSelect={(v) => setHasImage(v)}
         title="内容筛选"
       />
 

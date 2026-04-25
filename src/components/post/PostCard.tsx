@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Avatar } from '@rneui/themed';
+import { useNavigation } from '@react-navigation/native';
 import { PostItem } from '../../types';
 import { useTheme } from '../../theme/useTheme';
 import { EyeIcon, HeartIcon, HeartOutlineIcon } from '../icons';
@@ -14,11 +15,22 @@ type Props = {
 
 export default function PostCard({ post, onLikeToggle, onPress, compact }: Props) {
   const theme = useTheme();
+  const navigation = useNavigation<any>();
   const liked = !!post.liked;
   const likeCount = post.likeCount;
 
   const handleLike = () => {
     onLikeToggle?.(Number(post.id), !liked);
+  };
+
+  const handleAvatarPress = (e: any) => {
+    e.stopPropagation();
+    if (post.userId) {
+      navigation.navigate('UserProfile', {
+        userId: post.userId,
+        userName: post.author?.userName,
+      });
+    }
   };
 
   const avatarSource = post.author?.avatar
@@ -146,12 +158,12 @@ export default function PostCard({ post, onLikeToggle, onPress, compact }: Props
         ) : null}
 
         <View style={styles.footer}>
-          <View style={styles.author}>
+          <Pressable style={styles.author} onPress={handleAvatarPress}>
             <Avatar size={compact ? 16 : 20} rounded source={avatarSource} />
             <Text style={styles.authorName} numberOfLines={1}>
               {post.author?.userName || '未知用户'}
             </Text>
-          </View>
+          </Pressable>
 
           {!compact && (
             <View style={styles.metaWrap}>

@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Card } from '@rneui/themed';
 import { useTheme } from '../theme/useTheme';
 
 type Props = {
@@ -12,30 +11,23 @@ export default function ToastMessage({ message, testID }: Props) {
   const theme = useTheme();
 
   const styles = StyleSheet.create({
-    toastCard: {
-      position: 'absolute',
-      top: 18,
-      left: 16,
-      right: 16,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      margin: 0,
+    container: {
       backgroundColor: theme.colors.textMain,
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 12,
+      alignItems: 'center',
     },
-    toastText: {
+    text: {
       color: theme.colors.cardBg,
-      textAlign: 'center',
       fontSize: 14,
       fontWeight: '600',
     },
   });
 
   return (
-    <View testID={testID}>
-      <Card containerStyle={styles.toastCard}>
-        <Text style={styles.toastText}>{message}</Text>
-      </Card>
+    <View style={styles.container} testID={testID}>
+      <Text style={styles.text}>{message}</Text>
     </View>
   );
 }

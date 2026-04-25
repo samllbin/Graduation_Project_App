@@ -4,7 +4,10 @@ import { http } from './http';
 const asApiResponse = <T>(promise: Promise<any>) => promise as Promise<ApiResponse<T>>;
 
 export const getUserProfileApi = (userName: string) =>
-  asApiResponse<UserProfile>(http.get(`/user/${userName}`));
+  asApiResponse<UserProfile>(http.get(`/user/name/${userName}`));
+
+export const getUserByIdApi = (id: number) =>
+  asApiResponse<UserProfile>(http.get(`/user/id/${id}`));
 
 export const updateProfileApi = (params: UpdateProfileReq) =>
   asApiResponse<UserProfile>(http.patch('/user/profile', params));

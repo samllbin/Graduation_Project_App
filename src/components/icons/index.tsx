@@ -97,3 +97,10 @@ export const PaletteIcon = ({ size = 16, color = '#666', style }: IconProps) => 
     <Path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.062a1.63 1.63 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
   </Svg>
 );
+
+export const ArrowLeftIcon = ({ size = 16, color = '#666', style }: IconProps) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <Line x1="19" y1="12" x2="5" y2="12" />
+    <Polyline points="12 19 5 12 12 5" />
+  </Svg>
+);

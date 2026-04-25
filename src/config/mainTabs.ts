@@ -1,4 +1,4 @@
-export type MainTabKey = 'imageRecognition' | 'forum' | 'profile';
+export type MainTabKey = 'imageRecognition' | 'forum' | 'message' | 'profile';
 
 export type MainTabItem = {
   key: MainTabKey;
@@ -11,19 +11,25 @@ export const mainTabItems: MainTabItem[] = [
   {
     key: 'imageRecognition',
     name: 'ImageRecognition',
-    title: '图像识别',
+    title: '识别',
     icon: '🌿',
   },
   {
     key: 'forum',
     name: 'Forum',
-    title: '问题论坛',
+    title: '论坛',
     icon: '💬',
+  },
+  {
+    key: 'message',
+    name: 'Message',
+    title: '消息',
+    icon: '✉️',
   },
   {
     key: 'profile',
     name: 'Profile',
-    title: '个人中心',
+    title: '个人',
     icon: '👤',
   },
 ];

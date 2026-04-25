@@ -20,6 +20,7 @@ jest.mock('@react-navigation/native', () => {
         cb();
       }
     }),
+    useIsFocused: jest.fn(() => true),
   };
 });
 

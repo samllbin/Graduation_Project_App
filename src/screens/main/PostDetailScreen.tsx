@@ -56,6 +56,7 @@ export default function PostDetailScreen() {
   const [viewerVisible, setViewerVisible] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [liking, setLiking] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
   const currentUserId = getUserInfo()?.id ?? null;
@@ -287,8 +288,12 @@ export default function PostDetailScreen() {
       const res = await getPostDetailApi(numericPostId);
       if (res.code === 200 && res.data) {
         setPost(res.data);
+      } else {
+        setPost(null);
       }
-    } catch {}
+    } catch {
+      setPost(null);
+    }
   };
 
   const fetchComments = async (targetPage: number, isRefresh = false) => {
@@ -333,8 +338,9 @@ export default function PostDetailScreen() {
   };
 
   const handleLikeToggle = async () => {
-    if (!post) return;
+    if (!post || liking) return;
     const nextLiked = !post.liked;
+    setLiking(true);
     try {
       if (nextLiked) {
         await likePostApi(Number(post.id));
@@ -347,6 +353,9 @@ export default function PostDetailScreen() {
         likeCount: nextLiked ? post.likeCount + 1 : Math.max(post.likeCount - 1, 0),
       });
     } catch {}
+    finally {
+      setLiking(false);
+    }
   };
 
   const handleDeletePost = () => {
@@ -496,7 +505,7 @@ export default function PostDetailScreen() {
   if (!post) {
     return (
       <View style={styles.center}>
-        <Text style={styles.empty}>帖子不存在或已删除</Text>
+        <Text style={styles.empty}>帖子已被删除</Text>
       </View>
     );
   }
@@ -537,14 +546,22 @@ export default function PostDetailScreen() {
             <Text style={styles.contentText}>{post.contentText}</Text>
 
             <View style={styles.metaRow}>
-              <View style={styles.authorRow}>
+              <Pressable
+                style={styles.authorRow}
+                onPress={() =>
+                  navigation.navigate('UserProfile', {
+                    userId: post.userId,
+                    userName: post.author?.userName,
+                  })
+                }
+              >
                 <Avatar size={24} rounded source={avatarSource} />
                 <Text style={styles.authorName}>{post.author?.userName || '未知用户'}</Text>
                 <Text style={styles.metaTime}>{formatRelativeTime(post.createdAt)}</Text>
-              </View>
+              </Pressable>
 
               <View style={styles.metaRight}>
-                <Pressable onPress={handleLikeToggle} style={styles.likeBtn}>
+                <Pressable onPress={handleLikeToggle} style={[styles.likeBtn, liking && { opacity: 0.5 }]} disabled={liking}>
                   {post.liked ? (
                     <HeartIcon size={16} color={theme.colors.danger} />
                   ) : (

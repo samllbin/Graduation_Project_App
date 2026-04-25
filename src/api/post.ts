@@ -10,9 +10,10 @@ export const getPostListApi = (
   keyword?: string,
   hasImage?: string,
   timeRange?: string,
+  userId?: number,
 ) =>
   asApiResponse<PaginatedPostList>(
-    http.get('/post/list', { params: { sortBy, page, pageSize, keyword, hasImage, timeRange } }),
+    http.get('/post/list', { params: { sortBy, page, pageSize, keyword, hasImage, timeRange, userId } }),
   );
 
 export const getLikedPostsApi = (page = 1, pageSize = 10) =>

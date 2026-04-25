@@ -13,6 +13,9 @@ import ChangePasswordScreen from './src/screens/main/ChangePasswordScreen';
 import LikedPostsScreen from './src/screens/main/LikedPostsScreen';
 import CreatePostScreen from './src/screens/main/CreatePostScreen';
 import PostDetailScreen from './src/screens/main/PostDetailScreen';
+import MessageScreen from './src/screens/main/MessageScreen';
+import ChatScreen from './src/screens/main/ChatScreen';
+import UserProfileScreen from './src/screens/main/UserProfileScreen';
 import ToastMessage from './src/components/ToastMessage';
 import MainTabBar from './src/components/MainTabBar';
 import AppThemeProvider from './src/theme/AppThemeProvider';
@@ -33,22 +36,23 @@ const Stack = createNativeStackNavigator();
 
 function HomeTabs({
   onLogout,
-  showLoginSuccess,
 }: {
   onLogout: () => void;
-  showLoginSuccess: boolean;
 }) {
   const [activeTab, setActiveTab] = React.useState('imageRecognition');
+  const [unreadCount, setUnreadCount] = React.useState(0);
 
   return (
     <View style={styles.homeWrap} testID="home-screen">
       <View style={styles.homeContent}>
         {activeTab === 'forum' && <ForumScreen />}
+        <View style={[styles.homeContent, activeTab !== 'message' && { display: 'none' }]}>
+          <MessageScreen onUnreadChange={setUnreadCount} />
+        </View>
         {activeTab === 'profile' && <ProfileScreen onLogout={onLogout} />}
-        {activeTab !== 'forum' && activeTab !== 'profile' && <ImageRecognitionScreen />}
+        {activeTab !== 'forum' && activeTab !== 'message' && activeTab !== 'profile' && <ImageRecognitionScreen />}
       </View>
-      <MainTabBar activeTab={activeTab as any} onChangeTab={setActiveTab as any} />
-      {showLoginSuccess && <ToastMessage message="登录成功" testID="login-success-snackbar" />}
+      <MainTabBar activeTab={activeTab as any} onChangeTab={setActiveTab as any} unreadCount={unreadCount} />
     </View>
   );
 }
@@ -117,7 +121,7 @@ function AppInner() {
           {isLoggedIn ? (
             <>
               <Stack.Screen name="Home" options={{ headerShown: false }}>
-                {() => <HomeTabs onLogout={onLogout} showLoginSuccess={showLoginSuccess} />}
+                {() => <HomeTabs onLogout={onLogout} />}
               </Stack.Screen>
               <Stack.Screen name="ChangePassword" options={{ title: '修改密码' }}>
                 {() => <ChangePasswordScreen onSuccess={onLogout} />}
@@ -137,6 +141,16 @@ function AppInner() {
                 component={PostDetailScreen}
                 options={{ title: '帖子详情' }}
               />
+              <Stack.Screen
+                name="Chat"
+                component={ChatScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="UserProfile"
+                component={UserProfileScreen}
+                options={{ headerShown: false }}
+              />
               <Stack.Screen name="ForgotPassword" options={{ title: '找回密码' }}>
                 {() => <ForgotPasswordScreen onResetSuccess={onLogout} />}
               </Stack.Screen>
@@ -144,10 +158,10 @@ function AppInner() {
           ) : (
             <>
               <Stack.Screen name="Login" options={{ headerShown: false }}>
-                {() => (
+                {({ navigation }) => (
                   <LoginScreen
-                    onGotoRegister={() => {}}
-                    onGotoForgot={() => {}}
+                    onGotoRegister={() => navigation.navigate('Register')}
+                    onGotoForgot={() => navigation.navigate('ForgotPassword')}
                     onLoginSuccess={() => {
                       setIsLoggedIn(true);
                       setShowLoginSuccess(true);
@@ -157,9 +171,9 @@ function AppInner() {
                 )}
               </Stack.Screen>
               <Stack.Screen name="Register" options={{ title: '注册' }}>
-                {() => (
+                {({ navigation }) => (
                   <RegisterScreen
-                    onBackLogin={() => {}}
+                    onBackLogin={() => navigation.goBack()}
                     onRegisterSuccess={() => {
                       setIsLoggedIn(true);
                       setShowLoginSuccess(true);
@@ -179,6 +193,11 @@ function AppInner() {
       {showReloginNotice && (
         <View style={styles.toastWrap}>
           <ToastMessage message="请重新登录" testID="relogin-snackbar" />
+        </View>
+      )}
+      {showLoginSuccess && (
+        <View style={styles.toastWrap}>
+          <ToastMessage message="登录成功" testID="login-success-snackbar" />
         </View>
       )}
     </>
@@ -206,5 +225,6 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
     zIndex: 999,
+    elevation: 999,
   },
 });
