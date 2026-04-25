@@ -79,7 +79,7 @@ export default function ChatScreen() {
     setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
   }, []);
 
-  const { connect, disconnect, sendMessage: sendSocketMessage } = useSocket(handleNewMessage);
+  const { connect, disconnect } = useSocket(handleNewMessage);
 
   const scrollToBottom = () => {
     if (isLoadingOlderRef.current) return;
@@ -191,7 +191,6 @@ export default function ChatScreen() {
 
     try {
       setSending(true);
-      sendSocketMessage({ receiverId: otherUserId, content, type: 'text' });
       const res = await sendMessageApi({ receiverId: otherUserId, content, type: 'text' });
       if (res.code === 200 && res.data) {
         const serverMsg = res.data;
@@ -238,7 +237,6 @@ export default function ChatScreen() {
             };
             setMessages((prev) => [...prev, tempMsg]);
             scrollToBottom();
-            sendSocketMessage({ receiverId: otherUserId, content: '[图片]', type: 'image', imageUrl });
             const res = await sendMessageApi({ receiverId: otherUserId, content: '[图片]', type: 'image', imageUrl });
             if (res.code === 200 && res.data) {
               const serverMsg = res.data;

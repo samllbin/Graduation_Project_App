@@ -12,7 +12,7 @@ type RetryableRequestConfig = AxiosRequestConfig & {
   _retry?: boolean;
 };
 
-const BASE_URL = 'http://10.0.2.2:3000';
+const BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
 
 let refreshingPromise: Promise<string> | null = null;
 
