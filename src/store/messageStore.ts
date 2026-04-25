@@ -38,7 +38,8 @@ export const getLocalMessages = async (conversationId: number): Promise<MessageI
 
 export const saveLocalMessages = async (conversationId: number, messages: MessageItem[]) => {
   try {
-    await AsyncStorage.setItem(`${MESSAGES_PREFIX}${conversationId}`, JSON.stringify(messages));
+    const trimmed = messages.slice(-30);
+    await AsyncStorage.setItem(`${MESSAGES_PREFIX}${conversationId}`, JSON.stringify(trimmed));
   } catch {}
 };
 
