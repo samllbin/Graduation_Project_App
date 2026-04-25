@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { PostImage } from '../../types';
+import { CloseIcon } from '../icons';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -34,7 +35,7 @@ export default function ImageViewer({ visible, images, initialIndex = 0, onClose
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <Pressable style={styles.closeBtn} onPress={onClose}>
-          <Text style={styles.closeText}>✕</Text>
+          <CloseIcon size={18} color="#fff" />
         </Pressable>
 
         <FlatList

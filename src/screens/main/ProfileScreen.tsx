@@ -10,6 +10,7 @@ import { getUserInfo, setUserInfo } from '../../store/authStore';
 import { getStoredUserInfo, updateStoredUserInfo } from '../../store/authSession';
 import { getUserProfileApi } from '../../api/user';
 import { useTheme } from '../../theme/useTheme';
+import { HeartIcon, LockIcon, PaletteIcon, TypeIcon } from '../../components/icons';
 
 type Props = {
   onLogout: () => void;
@@ -56,13 +57,13 @@ export default function ProfileScreen({ onLogout }: Props) {
   }, [loadUser]);
 
   const accountItems = [
-    { label: '修改密码', icon: '🔒', onPress: () => navigation.navigate('ChangePassword') },
-    { label: '我点赞的帖子', icon: '❤️', onPress: () => navigation.navigate('LikedPosts') },
+    { label: '修改密码', icon: <LockIcon size={16} color={theme.colors.textSecondary} />, onPress: () => navigation.navigate('ChangePassword') },
+    { label: '我点赞的帖子', icon: <HeartIcon size={16} color={theme.colors.danger} />, onPress: () => navigation.navigate('LikedPosts') },
   ];
 
   const settingsItems = [
-    { label: '字号选择', icon: '🔤', onPress: () => setShowFontPicker(true) },
-    { label: '主题选择', icon: '🎨', onPress: () => setShowThemePicker(true) },
+    { label: '字号选择', icon: <TypeIcon size={16} color={theme.colors.textSecondary} />, onPress: () => setShowFontPicker(true) },
+    { label: '主题选择', icon: <PaletteIcon size={16} color={theme.colors.textSecondary} />, onPress: () => setShowThemePicker(true) },
   ];
 
   const confirmLogout = () => {

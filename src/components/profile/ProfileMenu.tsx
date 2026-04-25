@@ -5,7 +5,7 @@ import { useTheme } from '../../theme/useTheme';
 
 type MenuItem = {
   label: string;
-  icon: string;
+  icon: React.ReactNode;
   onPress: () => void;
 };
 

@@ -15,6 +15,14 @@ import PostCard from '../../components/post/PostCard';
 import { getPostListApi, likePostApi, unlikePostApi } from '../../api/post';
 import { PostItem } from '../../types';
 import { useTheme } from '../../theme/useTheme';
+import {
+  ChevronDownIcon,
+  CloseIcon,
+  DoubleColumnIcon,
+  PlusIcon,
+  SearchIcon,
+  SingleColumnIcon,
+} from '../../components/icons';
 
 type FilterOption = { label: string; value: string | undefined };
 
@@ -29,6 +37,12 @@ const imageOptions: FilterOption[] = [
   { label: '全部内容', value: undefined },
   { label: '有图', value: 'true' },
   { label: '无图', value: 'false' },
+];
+
+const sortOptions: FilterOption[] = [
+  { label: '最新发布', value: 'time' },
+  { label: '最多喜欢', value: 'likes' },
+  { label: '最多浏览', value: 'views' },
 ];
 
 export default function ForumScreen() {
@@ -49,8 +63,16 @@ export default function ForumScreen() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
 
+  const [sortBy, setSortBy] = useState<string>('time');
+  const [showSortPicker, setShowSortPicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showImagePicker, setShowImagePicker] = useState(false);
+
+  const closeAllPickers = () => {
+    setShowSortPicker(false);
+    setShowTimePicker(false);
+    setShowImagePicker(false);
+  };
 
   // debounce keyword
   useEffect(() => {
@@ -67,7 +89,7 @@ export default function ForumScreen() {
         setError('');
 
         const res = await getPostListApi(
-          'time',
+          sortBy,
           targetPage,
           layout === 'double' ? 20 : 10,
           debouncedKeyword || undefined,
@@ -90,7 +112,7 @@ export default function ForumScreen() {
         setLoadingMore(false);
       }
     },
-    [debouncedKeyword, hasImage, timeRange, layout],
+    [debouncedKeyword, hasImage, timeRange, layout, sortBy],
   );
 
   useEffect(() => {
@@ -140,6 +162,7 @@ export default function ForumScreen() {
     />
   );
 
+  const activeSortLabel = sortOptions.find((o) => o.value === sortBy)?.label || '最新发布';
   const activeTimeLabel = timeOptions.find((o) => o.value === timeRange)?.label || '全部时间';
   const activeImageLabel = imageOptions.find((o) => o.value === hasImage)?.label || '全部内容';
 
@@ -231,7 +254,7 @@ export default function ForumScreen() {
             },
           ]}
         >
-          <Text style={styles.searchIcon}>🔍</Text>
+          <SearchIcon size={14} color={theme.colors.textSecondary} />
           <TextInput
             style={[
               styles.searchInput,
@@ -245,7 +268,7 @@ export default function ForumScreen() {
           />
           {!!keyword && (
             <Pressable onPress={() => setKeyword('')}>
-              <Text style={styles.clearIcon}>✕</Text>
+              <CloseIcon size={14} color="#999" />
             </Pressable>
           )}
         </View>
@@ -261,6 +284,18 @@ export default function ForumScreen() {
           },
         ]}
       >
+        <Pressable style={styles.filterBtn} onPress={() => setShowSortPicker(true)}>
+          <Text
+            style={[
+              styles.filterBtnText,
+              { color: sortBy !== 'time' ? theme.colors.primary : theme.colors.textSecondary },
+            ]}
+          >
+            {activeSortLabel}
+          </Text>
+          <ChevronDownIcon size={10} color={theme.colors.textSecondary} />
+        </Pressable>
+
         <Pressable style={styles.filterBtn} onPress={() => setShowTimePicker(true)}>
           <Text
             style={[
@@ -270,7 +305,7 @@ export default function ForumScreen() {
           >
             {activeTimeLabel}
           </Text>
-          <Text style={[styles.filterArrow, { color: theme.colors.textSecondary }]}>▼</Text>
+          <ChevronDownIcon size={10} color={theme.colors.textSecondary} />
         </Pressable>
 
         <Pressable style={styles.filterBtn} onPress={() => setShowImagePicker(true)}>
@@ -282,7 +317,7 @@ export default function ForumScreen() {
           >
             {activeImageLabel}
           </Text>
-          <Text style={[styles.filterArrow, { color: theme.colors.textSecondary }]}>▼</Text>
+          <ChevronDownIcon size={10} color={theme.colors.textSecondary} />
         </Pressable>
 
         <View style={styles.layoutSwitch}>
@@ -301,7 +336,7 @@ export default function ForumScreen() {
                 { color: layout === 'single' ? theme.colors.primary : theme.colors.textSecondary },
               ]}
             >
-              ▭
+              <SingleColumnIcon size={16} color={layout === 'single' ? theme.colors.primary : theme.colors.textSecondary} />
             </Text>
           </Pressable>
           <Pressable
@@ -319,12 +354,20 @@ export default function ForumScreen() {
                 { color: layout === 'double' ? theme.colors.primary : theme.colors.textSecondary },
               ]}
             >
-              ▦
+              <DoubleColumnIcon size={16} color={layout === 'double' ? theme.colors.primary : theme.colors.textSecondary} />
             </Text>
           </Pressable>
         </View>
       </View>
 
+      <FilterPicker
+        visible={showSortPicker}
+        onClose={() => setShowSortPicker(false)}
+        options={sortOptions}
+        value={sortBy}
+        onSelect={setSortBy}
+        title="排序方式"
+      />
       <FilterPicker
         visible={showTimePicker}
         onClose={() => setShowTimePicker(false)}
@@ -417,7 +460,7 @@ export default function ForumScreen() {
         }}
         onPress={() => navigation.navigate('CreatePost')}
       >
-        <Text style={styles.fabText}>+</Text>
+        <PlusIcon size={28} color="#fff" />
       </Pressable>
     </View>
   );

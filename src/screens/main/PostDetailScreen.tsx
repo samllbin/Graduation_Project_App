@@ -30,6 +30,7 @@ import { PostItem } from '../../types';
 import { getUserInfo } from '../../store/authStore';
 import { formatRelativeTime } from '../../utils/time';
 import { useTheme } from '../../theme/useTheme';
+import { CloseIcon, EyeIcon, HeartIcon, HeartOutlineIcon, TrashIcon } from '../../components/icons';
 
 type ReplyTarget = {
   commentId: number;
@@ -106,6 +107,11 @@ export default function PostDetailScreen() {
       fontSize: Math.round(12 * theme.fontScale),
       color: theme.colors.textSecondary,
     },
+    metaRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.sm,
+    },
     likeBtn: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -115,6 +121,13 @@ export default function PostDetailScreen() {
     likeIconActive: { color: theme.colors.danger },
     likeCount: { fontSize: Math.round(13 * theme.fontScale), color: theme.colors.textSecondary },
     likeCountActive: { color: theme.colors.danger, fontWeight: '600' },
+    viewBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    viewIcon: { fontSize: 14 },
+    viewCount: { fontSize: Math.round(13 * theme.fontScale), color: theme.colors.textSecondary },
     divider: {
       height: 1,
       backgroundColor: theme.colors.border,
@@ -434,7 +447,7 @@ export default function PostDetailScreen() {
         </Pressable>
         {canDeleteComment(item) && (
           <Pressable onPress={() => handleDeleteComment(item)} style={styles.deleteIconWrap}>
-            <Text style={styles.deleteIcon}>🗑️</Text>
+            <TrashIcon size={14} color={theme.colors.danger} />
           </Pressable>
         )}
       </View>
@@ -462,7 +475,7 @@ export default function PostDetailScreen() {
               </Pressable>
               {canDeleteComment(reply) && (
                 <Pressable onPress={() => handleDeleteComment(reply)} style={styles.deleteIconWrap}>
-                  <Text style={styles.deleteIcon}>🗑️</Text>
+                  <TrashIcon size={14} color={theme.colors.danger} />
                 </Pressable>
               )}
             </View>
@@ -530,14 +543,22 @@ export default function PostDetailScreen() {
                 <Text style={styles.metaTime}>{formatRelativeTime(post.createdAt)}</Text>
               </View>
 
-              <Pressable onPress={handleLikeToggle} style={styles.likeBtn}>
-                <Text style={[styles.likeIcon, post.liked && styles.likeIconActive]}>
-                  {post.liked ? '❤️' : '🤍'}
-                </Text>
-                <Text style={[styles.likeCount, post.liked && styles.likeCountActive]}>
-                  {post.likeCount}
-                </Text>
-              </Pressable>
+              <View style={styles.metaRight}>
+                <Pressable onPress={handleLikeToggle} style={styles.likeBtn}>
+                  {post.liked ? (
+                    <HeartIcon size={16} color={theme.colors.danger} />
+                  ) : (
+                    <HeartOutlineIcon size={16} color={theme.colors.textSecondary} />
+                  )}
+                  <Text style={[styles.likeCount, post.liked && styles.likeCountActive]}>
+                    {post.likeCount}
+                  </Text>
+                </Pressable>
+                <View style={styles.viewBtn}>
+                  <EyeIcon size={14} color={theme.colors.textSecondary} />
+                  <Text style={styles.viewCount}>{post.viewCount}</Text>
+                </View>
+              </View>
             </View>
 
             <View style={styles.divider} />
@@ -559,7 +580,7 @@ export default function PostDetailScreen() {
           <View style={styles.replyHint}>
             <Text style={styles.replyHintText}>回复 {replyTarget.replyToUserName}</Text>
             <Pressable onPress={() => setReplyTarget(null)}>
-              <Text style={styles.replyHintClose}>✕</Text>
+              <CloseIcon size={14} color={theme.colors.textSecondary} />
             </Pressable>
           </View>
         )}

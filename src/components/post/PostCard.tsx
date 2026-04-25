@@ -3,6 +3,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Avatar } from '@rneui/themed';
 import { PostItem } from '../../types';
 import { useTheme } from '../../theme/useTheme';
+import { EyeIcon, HeartIcon, HeartOutlineIcon } from '../icons';
 
 type Props = {
   post: PostItem;
@@ -82,6 +83,11 @@ export default function PostCard({ post, onLikeToggle, onPress, compact }: Props
       fontSize: Math.round(compact ? 11 : 13 * theme.fontScale),
       color: theme.colors.textSecondary,
     },
+    metaWrap: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.sm,
+    },
     likeWrap: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -100,6 +106,18 @@ export default function PostCard({ post, onLikeToggle, onPress, compact }: Props
     likeCountActive: {
       color: theme.colors.danger,
       fontWeight: '600',
+    },
+    viewWrap: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    viewIcon: {
+      fontSize: 14,
+    },
+    viewCount: {
+      fontSize: Math.round(13 * theme.fontScale),
+      color: theme.colors.textSecondary,
     },
   });
 
@@ -136,12 +154,20 @@ export default function PostCard({ post, onLikeToggle, onPress, compact }: Props
           </View>
 
           {!compact && (
-            <Pressable onPress={handleLike} style={styles.likeWrap}>
-              <Text style={[styles.likeIcon, liked && styles.likeIconActive]}>
-                {liked ? '❤️' : '🤍'}
-              </Text>
-              <Text style={[styles.likeCount, liked && styles.likeCountActive]}>{likeCount}</Text>
-            </Pressable>
+            <View style={styles.metaWrap}>
+              <Pressable onPress={handleLike} style={styles.likeWrap}>
+                {liked ? (
+                  <HeartIcon size={16} color={theme.colors.danger} />
+                ) : (
+                  <HeartOutlineIcon size={16} color={theme.colors.textSecondary} />
+                )}
+                <Text style={[styles.likeCount, liked && styles.likeCountActive]}>{likeCount}</Text>
+              </Pressable>
+              <View style={styles.viewWrap}>
+                <EyeIcon size={14} color={theme.colors.textSecondary} />
+                <Text style={styles.viewCount}>{post.viewCount}</Text>
+              </View>
+            </View>
           )}
         </View>
       </View>

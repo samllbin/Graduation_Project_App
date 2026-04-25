@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { createPostApi, uploadImageApi } from '../../api/post';
 import { useTheme } from '../../theme/useTheme';
+import { CloseIcon, PlusIcon } from '../../components/icons';
 
 export default function CreatePostScreen() {
   const theme = useTheme();
@@ -219,14 +220,14 @@ export default function CreatePostScreen() {
             <View key={`${img.uri}-${index}`} style={styles.imageWrap}>
               <Image source={{ uri: img.uri }} style={styles.previewImage} resizeMode="cover" />
               <Pressable style={styles.removeBtn} onPress={() => handleRemoveImage(index)}>
-                <Text style={styles.removeText}>✕</Text>
+                <CloseIcon size={12} color="#fff" />
               </Pressable>
             </View>
           ))}
 
           {images.length < 9 && (
             <Pressable style={styles.addBtn} onPress={handlePickImage}>
-              <Text style={styles.addText}>+</Text>
+              <PlusIcon size={32} color={theme.colors.primary} />
             </Pressable>
           )}
         </View>
