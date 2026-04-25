@@ -3,8 +3,17 @@ import { http } from './http';
 
 const asApiResponse = <T>(promise: Promise<any>) => promise as Promise<ApiResponse<T>>;
 
-export const getPostListApi = (sortBy?: string, page = 1, pageSize = 10) =>
-  asApiResponse<PaginatedPostList>(http.get('/post/list', { params: { sortBy, page, pageSize } }));
+export const getPostListApi = (
+  sortBy?: string,
+  page = 1,
+  pageSize = 10,
+  keyword?: string,
+  hasImage?: string,
+  timeRange?: string,
+) =>
+  asApiResponse<PaginatedPostList>(
+    http.get('/post/list', { params: { sortBy, page, pageSize, keyword, hasImage, timeRange } }),
+  );
 
 export const getLikedPostsApi = (page = 1, pageSize = 10) =>
   asApiResponse<PaginatedPostList>(http.get('/post/liked', { params: { page, pageSize } }));
