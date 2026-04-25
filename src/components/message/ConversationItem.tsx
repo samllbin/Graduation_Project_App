@@ -18,9 +18,10 @@ function formatTime(iso: string | null) {
 type Props = {
   item: ConversationItemType;
   onPress: () => void;
+  onAvatarPress?: () => void;
 };
 
-export default function ConversationItem({ item, onPress }: Props) {
+export default function ConversationItem({ item, onPress, onAvatarPress }: Props) {
   const theme = useTheme();
   const currentUserId = getUserInfo()?.id ?? 0;
   const userAId = Number(item.userAId);
@@ -93,14 +94,16 @@ export default function ConversationItem({ item, onPress }: Props) {
 
   return (
     <Pressable style={styles.wrap} onPress={onPress}>
-      <Image
-        source={
-          otherUserAvatar
-            ? { uri: otherUserAvatar }
-            : { uri: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=default%20user%20avatar&size=128x128' }
-        }
-        style={styles.avatar}
-      />
+      <Pressable onPress={onAvatarPress}>
+        <Image
+          source={
+            otherUserAvatar
+              ? { uri: otherUserAvatar }
+              : { uri: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=default%20user%20avatar&size=128x128' }
+          }
+          style={styles.avatar}
+        />
+      </Pressable>
       <View style={styles.body}>
         <View style={styles.topRow}>
           <Text style={styles.name}>{otherUserName}</Text>

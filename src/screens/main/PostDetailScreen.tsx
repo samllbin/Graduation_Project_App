@@ -447,7 +447,15 @@ export default function PostDetailScreen() {
           onPress={() => handleReply(item)}
           style={styles.commentMain}
         >
-          <Avatar size={32} rounded source={{ uri: item.author?.avatar || 'https://neeko-copilot.bytedance.net/api/text2image?prompt=default%20user%20avatar&size=128x128' }} />
+          <Pressable
+            onPress={() => {
+              if (item.author?.id && item.author.id !== getUserInfo()?.id) {
+                navigation.navigate('UserProfile', { userId: item.author.id, userName: item.author?.userName });
+              }
+            }}
+          >
+            <Avatar size={32} rounded source={{ uri: item.author?.avatar || 'https://neeko-copilot.bytedance.net/api/text2image?prompt=default%20user%20avatar&size=128x128' }} />
+          </Pressable>
           <View style={styles.commentBody}>
             <Text style={styles.commentAuthor}>{item.author?.userName || '未知用户'}</Text>
             <Text style={styles.commentText}>{item.contentText}</Text>

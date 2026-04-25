@@ -10,6 +10,7 @@ type Props = {
   myAvatar?: string;
   otherAvatar?: string;
   onImagePress?: (url: string) => void;
+  onAvatarPress?: () => void;
 };
 
 const DEFAULT_AVATAR =
@@ -39,6 +40,7 @@ export default function ChatMessage({
   myAvatar,
   otherAvatar,
   onImagePress,
+  onAvatarPress,
 }: Props) {
   const theme = useTheme();
   const currentUserId = getUserInfo()?.id ?? 0;
@@ -101,7 +103,13 @@ export default function ChatMessage({
     <View style={styles.wrap}>
       {showTime && <Text style={styles.timeLabel}>{formatTimeLabel(message.createdAt)}</Text>}
       <View style={[styles.row, isMe && styles.rowMe]}>
-        <Image source={avatarSource} style={styles.avatar} />
+        {isMe ? (
+          <Image source={avatarSource} style={styles.avatar} />
+        ) : (
+          <Pressable onPress={onAvatarPress}>
+            <Image source={avatarSource} style={styles.avatar} />
+          </Pressable>
+        )}
         <View style={styles.bubble}>
           {message.type === 'image' && message.imageUrl ? (
             <Pressable onPress={() => onImagePress?.(message.imageUrl!)}>

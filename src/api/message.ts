@@ -35,7 +35,7 @@ export const getConversationsApi = () =>
 
 export const getMessagesApi = (conversationId: number, page = 1) =>
   asApiResponse<{ list: MessageItem[]; pagination: { page: number; pageSize: number; total: number; totalPages: number } }>(
-    http.get('/message/list', { params: { conversationId, page } }),
+    http.get('/message/list', { params: { conversationId, page, pageSize: 15 } }),
   );
 
 export const sendMessageApi = (params: {

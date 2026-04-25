@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { PostItem } from '../../types';
 import { useTheme } from '../../theme/useTheme';
 import { EyeIcon, HeartIcon, HeartOutlineIcon } from '../icons';
+import PostImageGrid from './PostImageGrid';
 
 type Props = {
   post: PostItem;
@@ -18,6 +19,7 @@ export default function PostCard({ post, onLikeToggle, onPress, compact }: Props
   const navigation = useNavigation<any>();
   const liked = !!post.liked;
   const likeCount = post.likeCount;
+  const [coverError, setCoverError] = React.useState(false);
 
   const handleLike = () => {
     onLikeToggle?.(Number(post.id), !liked);
@@ -135,8 +137,14 @@ export default function PostCard({ post, onLikeToggle, onPress, compact }: Props
 
   return (
     <Pressable style={styles.card} onPress={() => onPress?.(post)}>
-      {post.coverImageUrl ? (
-        <Image source={{ uri: post.coverImageUrl }} style={styles.cover} />
+      {post.coverImageUrl && !coverError ? (
+        <Image
+          source={{ uri: post.coverImageUrl }}
+          style={styles.cover}
+          onError={() => {
+            setCoverError(true);
+          }}
+        />
       ) : (
         <View style={styles.coverPlaceholder}>
           <Text style={styles.placeholderText} numberOfLines={compact ? 3 : 4}>

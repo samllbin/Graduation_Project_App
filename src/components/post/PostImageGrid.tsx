@@ -40,7 +40,12 @@ export default function PostImageGrid({ images, onPressImage }: Props) {
     <View style={containerStyle}>
       {images.map((img, index) => (
         <Pressable key={`${img.imageUrl}-${index}`} onPress={() => onPressImage?.(index)}>
-          <Image source={{ uri: img.imageUrl }} style={[styles.image, itemStyle]} resizeMode="cover" />
+          <Image
+            source={{ uri: img.imageUrl }}
+            style={[styles.image, itemStyle]}
+            resizeMode="cover"
+            onError={() => {}}
+          />
         </Pressable>
       ))}
     </View>

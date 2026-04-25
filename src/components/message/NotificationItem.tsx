@@ -6,6 +6,7 @@ import { useTheme } from '../../theme/useTheme';
 type Props = {
   item: NotificationItemType;
   onPress: () => void;
+  onAvatarPress?: () => void;
 };
 
 function getNotificationText(item: NotificationItemType) {
@@ -16,7 +17,7 @@ function getNotificationText(item: NotificationItemType) {
   return count > 1 ? `${senderName} 等 ${count} 人评论了你的帖子` : `${senderName} 评论了你的帖子`;
 }
 
-export default function NotificationItem({ item, onPress }: Props) {
+export default function NotificationItem({ item, onPress, onAvatarPress }: Props) {
   const theme = useTheme();
 
   const styles = StyleSheet.create({
@@ -75,14 +76,16 @@ export default function NotificationItem({ item, onPress }: Props) {
   return (
     <Pressable style={styles.wrap} onPress={onPress}>
       <View style={styles.avatarWrap}>
-        <Image
-          source={
-            item.senderAvatar
-              ? { uri: item.senderAvatar }
-              : { uri: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=default%20user%20avatar&size=128x128' }
-          }
-          style={styles.avatar}
-        />
+        <Pressable onPress={onAvatarPress}>
+          <Image
+            source={
+              item.senderAvatar
+                ? { uri: item.senderAvatar }
+                : { uri: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=default%20user%20avatar&size=128x128' }
+            }
+            style={styles.avatar}
+          />
+        </Pressable>
         {!item.isRead && <View style={styles.dot} />}
       </View>
       <View style={styles.body}>

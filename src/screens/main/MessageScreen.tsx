@@ -275,9 +275,20 @@ export default function MessageScreen({ onUnreadChange }: Props) {
       data={conversations}
       keyExtractor={(item) => String(item.id)}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => fetchConversations(true)} />}
-      renderItem={({ item }) => (
-        <ConversationItem item={item} onPress={() => handleConversationPress(item)} />
-      )}
+      renderItem={({ item }) => {
+        const currentUserId = getUserInfo()?.id ?? 0;
+        const userAId = Number(item.userAId);
+        const userBId = Number(item.userBId);
+        const otherUserId = userAId === currentUserId ? userBId : userAId;
+        const otherUserName = item.otherUserName || (userAId === currentUserId ? `用户${userBId}` : `用户${userAId}`);
+        return (
+          <ConversationItem
+            item={item}
+            onPress={() => handleConversationPress(item)}
+            onAvatarPress={() => navigation.navigate('UserProfile', { userId: otherUserId, userName: otherUserName })}
+          />
+        );
+      }}
       ListEmptyComponent={
         !loading ? (
           <View style={[styles.center, { padding: theme.spacing.lg }]}>
@@ -294,7 +305,11 @@ export default function MessageScreen({ onUnreadChange }: Props) {
       keyExtractor={(item) => String(item.id)}
       refreshControl={<RefreshControl refreshing={notifRefreshing} onRefresh={() => fetchNotifications(true)} />}
       renderItem={({ item }) => (
-        <NotificationItem item={item} onPress={() => handleNotificationPress(item)} />
+        <NotificationItem
+          item={item}
+          onPress={() => handleNotificationPress(item)}
+          onAvatarPress={() => navigation.navigate('UserProfile', { userId: item.senderId, userName: item.senderName })}
+        />
       )}
       ListEmptyComponent={
         !notifLoading ? (
