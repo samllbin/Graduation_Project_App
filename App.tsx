@@ -29,6 +29,8 @@ import {
 import { clearSession, getSessionTokens, getStoredUserInfo } from './src/store/authSession';
 import { logoutApi } from './src/api/auth';
 import { createTheme } from './src/theme/agriTheme';
+import { initErrorTracker } from './src/utils/errorTracker';
+import { initAnalytics, trackPageView } from './src/utils/analytics';
 
 const staticTheme = createTheme('light', 1);
 
@@ -41,6 +43,10 @@ function HomeTabs({
 }) {
   const [activeTab, setActiveTab] = React.useState('imageRecognition');
   const [unreadCount, setUnreadCount] = React.useState(0);
+
+  React.useEffect(() => {
+    trackPageView(`tab-${activeTab}`);
+  }, [activeTab]);
 
   return (
     <View style={styles.homeWrap} testID="home-screen">
@@ -65,6 +71,7 @@ function AppInner() {
 
   useEffect(() => {
     (async () => {
+      initErrorTracker();
       const session = await getSessionTokens();
       if (session?.accessToken) {
         setStoreToken(session.accessToken);
@@ -74,6 +81,7 @@ function AppInner() {
         }
         setIsLoggedIn(true);
       }
+      await initAnalytics();
       setInitializing(false);
     })();
   }, []);
@@ -109,7 +117,12 @@ function AppInner() {
 
   return (
     <>
-      <NavigationContainer>
+      <NavigationContainer
+        onStateChange={(state) => {
+          const routeName = getActiveRouteName(state);
+          if (routeName) trackPageView(routeName);
+        }}
+      >
         <Stack.Navigator
           screenOptions={{
             headerStyle: { backgroundColor: staticTheme.colors.pageBg },
@@ -212,6 +225,15 @@ export default function App() {
       </AppThemeProvider>
     </SafeAreaProvider>
   );
+}
+
+function getActiveRouteName(state: any): string | null {
+  if (!state || !state.routes || state.routes.length === 0) return null;
+  const route = state.routes[state.index];
+  if (route.state) {
+    return getActiveRouteName(route.state);
+  }
+  return route.name;
 }
 
 const styles = StyleSheet.create({

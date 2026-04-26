@@ -59,7 +59,7 @@ export default function ChatScreen() {
   const conversationIdRef = useRef(conversationId);
   const otherUserIdRef = useRef(otherUserId);
   const isLoadingMoreRef = useRef(false);
-  const isLoadingOlderRef = useRef(false);
+  const hasUserScrolledRef = useRef(false);
   conversationIdRef.current = conversationId;
   otherUserIdRef.current = otherUserId;
 
@@ -75,16 +75,11 @@ export default function ChatScreen() {
     if (msg.conversationId) {
       conversationIdRef.current = Number(msg.conversationId);
     }
-    setMessages((prev) => [...prev, msg]);
-    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+    // 倒序数组：新消息插入开头
+    setMessages((prev) => [msg, ...prev]);
   }, []);
 
   const { connect, disconnect } = useSocket(handleNewMessage);
-
-  const scrollToBottom = () => {
-    if (isLoadingOlderRef.current) return;
-    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
-  };
 
   const loadMessages = useCallback(async () => {
     if (!conversationIdRef.current) return;
@@ -92,12 +87,12 @@ export default function ChatScreen() {
     try {
       setLoading(true);
       const local = await getLocalMessages(convId);
-      if (local.length > 0) setMessages(local);
+      if (local.length > 0) setMessages([...local].reverse());
 
       const res = await getMessagesApi(convId, 1);
       if (res.code === 200 && res.data) {
         const all = res.data.list;
-        setMessages(all);
+        setMessages([...all].reverse());
         await saveLocalMessages(convId, all);
         setMessagePage(1);
         setMessageTotalPages(res.data.pagination.totalPages);
@@ -109,8 +104,6 @@ export default function ChatScreen() {
         setUnreadMessageCount(unreadRes.data || 0);
         eventBus.emit('unreadMessagesUpdated', unreadRes.data || 0);
       }
-
-      scrollToBottom();
     } catch {
       // use local
     } finally {
@@ -122,17 +115,19 @@ export default function ChatScreen() {
     if (!conversationIdRef.current) return;
     if (isLoadingMoreRef.current) return;
     if (messagePage >= messageTotalPages) return;
+    // 防止初始化时 onEndReached 误触发
+    if (!hasUserScrolledRef.current) return;
 
     const convId = conversationIdRef.current;
     try {
       isLoadingMoreRef.current = true;
-      isLoadingOlderRef.current = true;
       setLoadingMore(true);
       const nextPage = messagePage + 1;
       const res = await getMessagesApi(convId, nextPage);
       if (res.code === 200 && res.data) {
         const older = res.data.list;
-        setMessages((prev) => [...older, ...prev]);
+        // API 返回正序 [更旧, ..., 较旧]，反转后 append 到倒序数组末尾
+        setMessages((prev) => [...prev, ...older.reverse()]);
         setMessagePage(nextPage);
         setMessageTotalPages(res.data.pagination.totalPages);
       }
@@ -141,9 +136,6 @@ export default function ChatScreen() {
     } finally {
       setLoadingMore(false);
       isLoadingMoreRef.current = false;
-      setTimeout(() => {
-        isLoadingOlderRef.current = false;
-      }, 300);
     }
   }, [messagePage, messageTotalPages]);
 
@@ -151,7 +143,7 @@ export default function ChatScreen() {
     connect();
     loadMessages();
     return () => disconnect();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 获取对方用户信息
@@ -186,8 +178,8 @@ export default function ChatScreen() {
       isRead: 0,
       createdAt: new Date().toISOString(),
     };
-    setMessages((prev) => [...prev, tempMsg]);
-    scrollToBottom();
+    // 倒序数组：插入开头
+    setMessages((prev) => [tempMsg, ...prev]);
 
     try {
       setSending(true);
@@ -199,7 +191,7 @@ export default function ChatScreen() {
         }
         setMessages((prev) => {
           const next = prev.map((m) => (m.id === tempId ? serverMsg : m));
-          saveLocalMessages(serverMsg.conversationId, next).catch(() => {});
+          saveLocalMessages(serverMsg.conversationId, [...next].reverse()).catch(() => {});
           return next;
         });
       }
@@ -235,9 +227,13 @@ export default function ChatScreen() {
               isRead: 0,
               createdAt: new Date().toISOString(),
             };
-            setMessages((prev) => [...prev, tempMsg]);
-            scrollToBottom();
-            const res = await sendMessageApi({ receiverId: otherUserId, content: '[图片]', type: 'image', imageUrl });
+            setMessages((prev) => [tempMsg, ...prev]);
+            const res = await sendMessageApi({
+              receiverId: otherUserId,
+              content: '[图片]',
+              type: 'image',
+              imageUrl,
+            });
             if (res.code === 200 && res.data) {
               const serverMsg = res.data;
               if (serverMsg.conversationId) {
@@ -245,7 +241,7 @@ export default function ChatScreen() {
               }
               setMessages((prev) => {
                 const next = prev.map((m) => (m.id === tempId ? serverMsg : m));
-                saveLocalMessages(serverMsg.conversationId, next).catch(() => {});
+                saveLocalMessages(serverMsg.conversationId, [...next].reverse()).catch(() => {});
                 return next;
               });
             }
@@ -323,7 +319,8 @@ export default function ChatScreen() {
   });
 
   const renderItem = ({ item, index }: { item: MessageItem; index: number }) => {
-    const prev = index > 0 ? messages[index - 1] : null;
+    // 倒序数组：时间上的前一条在 index + 1
+    const prev = index < messages.length - 1 ? messages[index + 1] : null;
     const showTime = shouldShowTime(item, prev);
     return (
       <ChatMessage
@@ -331,6 +328,12 @@ export default function ChatScreen() {
         showTime={showTime}
         myAvatar={myAvatar}
         otherAvatar={otherUser?.avatar}
+        onAvatarPress={() =>
+          navigation.navigate('UserProfile', {
+            userId: item.senderId,
+            userName: otherUser?.userName,
+          })
+        }
       />
     );
   };
@@ -358,14 +361,24 @@ export default function ChatScreen() {
           data={messages}
           keyExtractor={(item) => String(item.id)}
           renderItem={renderItem}
-          onStartReached={loadOlderMessages}
-          onStartReachedThreshold={0.3}
-          ListHeaderComponent={
+          inverted
+          onEndReached={loadOlderMessages}
+          onEndReachedThreshold={0.3}
+          onScroll={() => {
+            if (!hasUserScrolledRef.current) {
+              hasUserScrolledRef.current = true;
+            }
+          }}
+          scrollEventThrottle={16}
+          ListFooterComponent={
             loadingMore ? (
-              <ActivityIndicator style={{ marginVertical: 12 }} color={theme.colors.primary} size="small" />
+              <ActivityIndicator
+                style={{ marginVertical: 12 }}
+                color={theme.colors.primary}
+                size="small"
+              />
             ) : null
           }
-          maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
         />
       )}
 
