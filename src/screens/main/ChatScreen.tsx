@@ -24,11 +24,7 @@ import {
 } from '../../api/message';
 import { getUserByIdApi } from '../../api/user';
 import { uploadImageApi } from '../../api/post';
-import {
-  getLocalMessages,
-  saveLocalMessages,
-  setUnreadMessageCount,
-} from '../../store/messageStore';
+import { getLocalMessages, saveLocalMessages, setUnreadMessageCount } from '../../store/messageStore';
 import { getUserInfo } from '../../store/authStore';
 import { eventBus } from '../../utils/eventBus';
 import ChatMessage from '../../components/message/ChatMessage';
@@ -59,34 +55,13 @@ export default function ChatScreen() {
   const [messagePage, setMessagePage] = useState(1);
   const [messageTotalPages, setMessageTotalPages] = useState(1);
   const [otherUser, setOtherUser] = useState<{ userName: string; avatar: string } | null>(null);
-  const [paddingBottom, setPaddingBottom] = useState(theme.spacing.lg * 2);
   const flatListRef = useRef<FlatList>(null);
   const conversationIdRef = useRef(conversationId);
   const otherUserIdRef = useRef(otherUserId);
   const isLoadingMoreRef = useRef(false);
   const isLoadingOlderRef = useRef(false);
-  const loadOlderMessagesRef = useRef<() => Promise<void>>(async () => {});
-  const layoutHeightRef = useRef(0);
-  const contentHeightRef = useRef(0);
-  const scrollOffsetRef = useRef(0);
-  const shouldScrollToBottomRef = useRef(false);
-  const pendingScrollAdjustRef = useRef<{ prevOffset: number; prevContentHeight: number } | null>(null);
   conversationIdRef.current = conversationId;
   otherUserIdRef.current = otherUserId;
-
-  const checkAutoLoadOlder = useCallback(() => {
-    if (
-      contentHeightRef.current > 0 &&
-      layoutHeightRef.current > 0 &&
-      contentHeightRef.current <= layoutHeightRef.current &&
-      messagePage < messageTotalPages
-    ) {
-      const fn = loadOlderMessagesRef.current;
-      if (typeof fn === 'function') {
-        fn();
-      }
-    }
-  }, [messagePage, messageTotalPages]);
 
   const myAvatar = getUserInfo()?.avatar;
 
@@ -100,7 +75,7 @@ export default function ChatScreen() {
     if (msg.conversationId) {
       conversationIdRef.current = Number(msg.conversationId);
     }
-    setMessages(prev => [...prev, msg]);
+    setMessages((prev) => [...prev, msg]);
     setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
   }, []);
 
@@ -122,7 +97,6 @@ export default function ChatScreen() {
       const res = await getMessagesApi(convId, 1);
       if (res.code === 200 && res.data) {
         const all = res.data.list;
-        shouldScrollToBottomRef.current = true;
         setMessages(all);
         await saveLocalMessages(convId, all);
         setMessagePage(1);
@@ -135,6 +109,8 @@ export default function ChatScreen() {
         setUnreadMessageCount(unreadRes.data || 0);
         eventBus.emit('unreadMessagesUpdated', unreadRes.data || 0);
       }
+
+      scrollToBottom();
     } catch {
       // use local
     } finally {
@@ -156,11 +132,7 @@ export default function ChatScreen() {
       const res = await getMessagesApi(convId, nextPage);
       if (res.code === 200 && res.data) {
         const older = res.data.list;
-        pendingScrollAdjustRef.current = {
-          prevOffset: scrollOffsetRef.current,
-          prevContentHeight: contentHeightRef.current,
-        };
-        setMessages(prev => [...older, ...prev]);
+        setMessages((prev) => [...older, ...prev]);
         setMessagePage(nextPage);
         setMessageTotalPages(res.data.pagination.totalPages);
       }
@@ -174,20 +146,19 @@ export default function ChatScreen() {
       }, 300);
     }
   }, [messagePage, messageTotalPages]);
-  loadOlderMessagesRef.current = loadOlderMessages;
 
   useEffect(() => {
     connect();
     loadMessages();
     return () => disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 获取对方用户信息
   useEffect(() => {
     if (!otherUserId) return;
     getUserByIdApi(otherUserId)
-      .then(res => {
+      .then((res) => {
         if (res.code === 200 && res.data) {
           setOtherUser({
             userName: res.data.userName,
@@ -215,7 +186,7 @@ export default function ChatScreen() {
       isRead: 0,
       createdAt: new Date().toISOString(),
     };
-    setMessages(prev => [...prev, tempMsg]);
+    setMessages((prev) => [...prev, tempMsg]);
     scrollToBottom();
 
     try {
@@ -226,8 +197,8 @@ export default function ChatScreen() {
         if (serverMsg.conversationId) {
           conversationIdRef.current = serverMsg.conversationId;
         }
-        setMessages(prev => {
-          const next = prev.map(m => (m.id === tempId ? serverMsg : m));
+        setMessages((prev) => {
+          const next = prev.map((m) => (m.id === tempId ? serverMsg : m));
           saveLocalMessages(serverMsg.conversationId, next).catch(() => {});
           return next;
         });
@@ -240,7 +211,7 @@ export default function ChatScreen() {
   };
 
   const handlePickImage = () => {
-    launchImageLibrary({ mediaType: 'photo', selectionLimit: 1 }, async response => {
+    launchImageLibrary({ mediaType: 'photo', selectionLimit: 1 }, async (response) => {
       if (response.assets?.[0]?.uri) {
         const uri = response.assets[0].uri;
         try {
@@ -264,21 +235,16 @@ export default function ChatScreen() {
               isRead: 0,
               createdAt: new Date().toISOString(),
             };
-            setMessages(prev => [...prev, tempMsg]);
+            setMessages((prev) => [...prev, tempMsg]);
             scrollToBottom();
-            const res = await sendMessageApi({
-              receiverId: otherUserId,
-              content: '[图片]',
-              type: 'image',
-              imageUrl,
-            });
+            const res = await sendMessageApi({ receiverId: otherUserId, content: '[图片]', type: 'image', imageUrl });
             if (res.code === 200 && res.data) {
               const serverMsg = res.data;
               if (serverMsg.conversationId) {
                 conversationIdRef.current = serverMsg.conversationId;
               }
-              setMessages(prev => {
-                const next = prev.map(m => (m.id === tempId ? serverMsg : m));
+              setMessages((prev) => {
+                const next = prev.map((m) => (m.id === tempId ? serverMsg : m));
                 saveLocalMessages(serverMsg.conversationId, next).catch(() => {});
                 return next;
               });
@@ -365,12 +331,6 @@ export default function ChatScreen() {
         showTime={showTime}
         myAvatar={myAvatar}
         otherAvatar={otherUser?.avatar}
-        onAvatarPress={() =>
-          navigation.navigate('UserProfile', {
-            userId: item.senderId,
-            userName: otherUser?.userName,
-          })
-        }
       />
     );
   };
@@ -388,67 +348,24 @@ export default function ChatScreen() {
         <Text style={styles.headerTitle}>{otherUser?.userName || `用户${otherUserId}`}</Text>
       </View>
 
-      {loading ? (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ActivityIndicator color={theme.colors.primary} />
-        </View>
+      {loading && messages.length === 0 ? (
+        <ActivityIndicator style={{ marginTop: 40 }} color={theme.colors.primary} />
       ) : (
         <FlatList
           ref={flatListRef}
           style={styles.list}
-          contentContainerStyle={{ paddingBottom }}
+          contentContainerStyle={{ paddingBottom: theme.spacing.lg * 2 }}
           data={messages}
-          keyExtractor={item => String(item.id)}
+          keyExtractor={(item) => String(item.id)}
           renderItem={renderItem}
-          scrollEventThrottle={16}
-          onLayout={e => {
-            const lh = e.nativeEvent.layout.height;
-            layoutHeightRef.current = lh;
-            const ch = contentHeightRef.current;
-            const next = ch > 0 && ch < lh ? lh - ch + 1 : theme.spacing.lg * 2;
-            if (next !== paddingBottom) setPaddingBottom(next);
-          }}
-          onContentSizeChange={(_w, h) => {
-            const realH = h - paddingBottom;
-            const prevRealH = contentHeightRef.current;
-            contentHeightRef.current = realH;
-            const lh = layoutHeightRef.current;
-            const next = lh > 0 && realH < lh ? lh - realH + 1 : theme.spacing.lg * 2;
-            if (next !== paddingBottom) setPaddingBottom(next);
-            if (shouldScrollToBottomRef.current && flatListRef.current && realH > lh) {
-              flatListRef.current.scrollToEnd({ animated: false });
-              setTimeout(() => flatListRef.current?.scrollToEnd({ animated: false }), 100);
-              shouldScrollToBottomRef.current = false;
-            }
-            if (pendingScrollAdjustRef.current && flatListRef.current && prevRealH > 0) {
-              const heightDiff = realH - prevRealH;
-              if (heightDiff > 0) {
-                flatListRef.current.scrollToOffset({
-                  offset: pendingScrollAdjustRef.current.prevOffset + heightDiff,
-                  animated: false,
-                });
-              }
-              pendingScrollAdjustRef.current = null;
-            }
-          }}
-          onScroll={({ nativeEvent }) => {
-            scrollOffsetRef.current = nativeEvent.contentOffset.y;
-            if (nativeEvent.contentOffset.y <= 10) {
-              const fn = loadOlderMessagesRef.current;
-              if (typeof fn === 'function') {
-                fn();
-              }
-            }
-          }}
+          onStartReached={loadOlderMessages}
+          onStartReachedThreshold={0.3}
           ListHeaderComponent={
             loadingMore ? (
-              <ActivityIndicator
-                style={{ marginVertical: 12 }}
-                color={theme.colors.primary}
-                size="small"
-              />
+              <ActivityIndicator style={{ marginVertical: 12 }} color={theme.colors.primary} size="small" />
             ) : null
           }
+          maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
         />
       )}
 
